@@ -1,0 +1,305 @@
+/* ===============================
+   GLOBAL
+================================ */
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background-color: #f4f6f8;
+    color: #333;
+}
+
+/* ===============================
+   HEADER
+================================ */
+.main-header {
+    background-color: #003366;
+    color: #ffffff;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-content h1 {
+    margin: 0;
+    font-size: 22px;
+}
+
+.header-content p {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.logout-btn {
+    background-color: #c0392b;
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.logout-btn:hover {
+    background-color: #a93226;
+}
+
+/* ===============================
+   SIDEBAR
+================================ */
+.sidebar {
+    width: 220px;
+    background-color: #1f2d3d;
+    position: fixed;
+    top: 78px;
+    bottom: 0;
+    padding-top: 20px;
+}
+
+.sidebar a {
+    display: block;
+    padding: 12px 20px;
+    color: #cfd8dc;
+    text-decoration: none;
+    font-size: 15px;
+}
+
+.sidebar a:hover,
+.sidebar a. {
+    background-color: #34495e;
+    color: #ffffff;
+}
+
+/* ===============================
+   MAIN CONTENT
+================================ */
+.main-content {
+    margin-left: 240px;
+    padding: 30px;
+}
+
+.main-content h2 {
+    margin-bottom: 20px;
+    color: #003366;
+}
+
+/* ===============================
+   CARD GRID
+================================ */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+}
+
+.card {
+    background-color: #ffffff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    text-align: center;
+}
+
+.card h3 {
+    margin-top: 0;
+    color: #003366;
+}
+
+.card p {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #555;
+}
+
+.card .btn {
+    display: inline-block;
+    margin-top: 0px;
+    padding: 10px 18px;
+    background-color: #003366;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.card .btn:hover {
+    background-color: #002244;
+}
+
+.card.disabled {
+    opacity: 0.6;
+}
+
+.coming-soon {
+    font-size: 13px;
+    font-style: italic;
+    color: #777;
+    margin-top: 15px;
+    display: inline-block;
+}
+
+
+input[type="text"],
+input[type="password"],
+select {
+    width: 98%;
+    padding: 10px;
+    margin: 8px 0 15px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+
+/* ===============================
+   FOOTER
+================================ */
+.footer {
+    margin-left: 240px;
+    padding: 15px;
+    text-align: center;
+    font-size: 13px;
+    color: #777;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th, .data-table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.status-available {
+    color: green;
+    font-weight: bold;
+}
+
+.status-occupied {
+    color: red;
+    font-weight: bold;
+}
+
+.subtitle {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.form-grid {
+    display: flex;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-grid div {
+    display: flex;
+    flex-direction: column;
+}
+
+.full-width {
+    grid-column: span 2;
+}
+
+.danger-card {
+    border-left: 4px solid #c0392b;
+}
+
+.btn.danger {
+    background-color: #c0392b;
+}
+
+.btn.danger:hover {
+    background-color: #a93226;
+}
+
+
+.message {
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    font-weight: bold;
+    margin-top:10px;
+}
+
+.message.error {
+    background: #fdecea;
+    color: #c0392b;
+}
+
+.message.success {
+    background: #e8f6f3;
+    color: #117a65;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.data-table th,
+.data-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.data-table th {
+    background: #2c3e50;
+    color: #fff;
+}
+
+/* Room Status Colors */
+.status-available {
+    color: #1b8a3b;
+    font-weight: bold;
+}
+
+.status-occupied {
+    color: #c0392b;
+    font-weight: bold;
+}
+
+/* Inline form */
+.inline-form {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* Status dropdown */
+.status-select {
+    padding: 6px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+/* Small button */
+.btn-small {
+    padding: 6px 12px;
+    background-color: #0d6efd;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.btn-small:hover {
+    background-color: #084298;
+}
+
+/* Page description */
+.page-desc {
+    margin-bottom: 15px;
+    color: #555;
+}
+
+.btn.danger {
+    background-color: #c0392b;
+}
+.btn.danger:hover {
+    background-color: #922b21;
+}
+

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Add Reservation | Ocean View Resort</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="main-header">
+    <div class="header-content">
+        <h1>Ocean View Resort</h1>
+        <p>New Reservation Booking</p>
+    </div>
+    <a href="logout" class="logout-btn">Logout</a>
+</header>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="addReservation.html" class="active">Add Reservation</a>
+</nav>
+
+<!-- MAIN -->
+<main class="main-content">
+
+<h2>📝 Add New Reservation</h2>
+<p class="page-desc">
+    Fill in guest details and select an available room to complete the booking.
+</p>
+
+<div class="card booking-card">
+
+<form action="addReservation" method="post" class="booking-form">
+
+    <!-- ===== GUEST DETAILS ===== -->
+    <h3 class="section-title">Guest Information</h3>
+
+    <div class="form-grid">
+
+        <div>
+            <label>Guest Name</label>
+            <input type="text" name="guestName" placeholder="John Doe" required>
+        </div>
+
+        <div>
+            <label>Contact Number</label>
+            <input type="text"
+                   name="contactNumber"
+                   placeholder="07XXXXXXXX"
+                   pattern="\d{10}"
+                   required>
+        </div>
+
+        <div>
+            <label>Email Address</label>
+            <input type="email"
+                   name="contactEmail"
+                   placeholder="guest@email.com"
+                   required>
+        </div>
+
+        <div>
+            <label>Address</label>
+            <input type="text"
+                   name="address"
+                   placeholder="City, Country"
+                   required>
+        </div>
+
+    </div>
+
+    <!-- ===== STAY DETAILS ===== -->
+    <h3 class="section-title">Stay Details</h3>
+
+    <div class="form-grid">
+
+        <div>
+            <label>Select Available Room</label>
+            <select name="roomId" id="roomSelect" required>
+                <option value="">Loading rooms...</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Check-in Date</label>
+            <input type="date" name="checkIn" required>
+        </div>
+
+        <div>
+            <label>Check-out Date</label>
+            <input type="date" name="checkOut" required>
+        </div>
+
+    </div>
+
+    <!-- ===== ACTION ===== -->
+    <div class="form-actions">
+        <button class="btn primary" type="submit">
+            ✔ Confirm Reservation
+        </button>
+        <a href="dashboard.html" class="btn secondary">
+            Cancel
+        </a>
+    </div>
+
+</form>
+</div>
+
+<!-- ===== STATUS MESSAGES ===== -->
+<div id="successBox" class="message success" style="display:none;">
+    Reservation booked successfully
+</div>
+
+<div id="errorBox" class="message error" style="display:none;">
+    Reservation booking failed. Please check details or room availability.
+</div>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+    &copy; 2026 Ocean View Resort – Galle
+</footer>
+
+<!-- ===== STATUS HANDLING ===== -->
+<script>
+const params = new URLSearchParams(window.location.search);
+
+if (params.get("status") === "success") {
+    document.getElementById("successBox").style.display = "block";
+}
+
+if (params.get("status") === "error") {
+    document.getElementById("errorBox").style.display = "block";
+}
+</script>
+
+<!-- ===== LOAD AVAILABLE ROOMS ===== -->
+<script>
+fetch("api/available-rooms")
+  .then(res => res.json())
+  .then(data => {
+
+    const select = document.getElementById("roomSelect");
+    select.innerHTML = "<option value=''>Select a room</option>";
+
+    if (!data || data.length === 0) {
+        select.innerHTML =
+          "<option>No available rooms</option>";
+        select.disabled = true;
+        return;
+    }
+
+    data.forEach(r => {
+        const opt = document.createElement("option");
+        opt.value = r.id;
+        opt.textContent =
+          "Room " + r.number + " • " + r.type + " • LKR " + r.price;
+        select.appendChild(opt);
+    });
+});
+</script>
+
+</body>
+</html>
