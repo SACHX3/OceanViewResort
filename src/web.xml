@@ -45,6 +45,15 @@
         <url-pattern>/addReservation</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>ViewReservationServlet</servlet-name>
+        <servlet-class>com.oceanview.controller.ViewReservationServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>ViewReservationServlet</servlet-name>
+        <url-pattern>/viewReservation</url-pattern>
+    </servlet-mapping>
 
     <!-- Welcome Page -->
     <welcome-file-list>
