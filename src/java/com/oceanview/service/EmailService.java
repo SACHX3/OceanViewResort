@@ -19,9 +19,9 @@ import javax.mail.internet.MimeMessage;
  */
 public class EmailService {
 
-    // ✅ TEST GMAIL ACCOUNT
+    // GMAIL ACCOUNT
     private static final String FROM_EMAIL = "sachworkspace5@gmail.com";
-    private static final String APP_PASSWORD = "hvinxthziojfktsl"; // NO SPACES
+    private static final String APP_PASSWORD = "hvinxthziojfktsl"; // 
 
     public void sendReservationConfirmation(Reservation r) {
 
@@ -59,7 +59,6 @@ public class EmailService {
 
             message.setSubject("Reservation Confirmation - Ocean View Resort");
 
-            // ✅ SIMPLE TEXT (NO HTML / NO CHARSET OVERLOAD)
             String body =
                 "Dear " + r.getGuestName() + ",\n\n" +
                 "Your reservation has been confirmed.\n\n" +

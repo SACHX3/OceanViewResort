@@ -14,7 +14,7 @@ public class Reservation {
     private LocalDate checkIn;
     private LocalDate checkOut;
 
-    // ✅ Reservation status: ACTIVE | CHECKED_OUT
+    // Reservation status: ACTIVE | CHECKED_OUT
     private String status;
 
     /* ================= GETTERS & SETTERS ================= */

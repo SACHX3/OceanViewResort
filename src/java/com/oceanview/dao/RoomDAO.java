@@ -9,15 +9,7 @@ import java.util.List;
 
 /**
  * RoomDAO
- * ----------------------------------------------------
- * Supports:
- * - Admin room management
- * - Staff room availability
- * - Reservation handling
- * - Room type dropdown
- *
- * Java 17 | Tomcat 9 | MySQL
- */
+ * ----------------------------------------------------*/
 public class RoomDAO {
 
     /* =================================================

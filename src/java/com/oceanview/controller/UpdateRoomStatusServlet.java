@@ -38,13 +38,13 @@ public class UpdateRoomStatusServlet extends HttpServlet {
 
             roomDAO.updateRoomStatus(roomId, status);
 
-            // ✅ SUCCESS
+            // SUCCESS
             resp.sendRedirect("checkRooms.html?success=true");
 
         } catch (Exception e) {
             e.printStackTrace();
 
-            // ❌ ERROR
+            // ERROR
             resp.sendRedirect("checkRooms.html?error=true");
         }
     }

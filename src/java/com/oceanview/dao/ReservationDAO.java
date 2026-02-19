@@ -12,8 +12,6 @@ import java.util.List;
  * ReservationDAO
  * -------------------------------------------------
  * Handles all reservation database operations
- *
- * Java 17 | Tomcat 9 | MySQL
  */
 public class ReservationDAO {
 

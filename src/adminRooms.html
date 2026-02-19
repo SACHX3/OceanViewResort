@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Manage Rooms | Admin</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="main-header">
+    <div class="header-content">
+        <h1>Ocean View Resort</h1>
+        <p>Room Management</p>
+    </div>
+    <a href="logout" class="logout-btn">Logout</a>
+</header>
+
+<nav class="sidebar">
+    <a href="adminPanel.html">Admin Panel</a>
+    <a href="manageUsers.html">Manage Users</a>
+    <a href="adminRooms.html" class="">Manage Rooms</a>
+</nav>
+
+<main class="main-content">
+
+<!-- ===== STATUS ===== -->
+<div class="message success" id="successBox" style="display:none;">
+Room added successfully
+</div>
+
+<div class="message error" id="errorBox" style="display:none;">
+Room deleted successfully
+</div>
+
+<!-- ===== ADD ROOM TYPE + ROOM ===== -->
+<h2>Add Room Type &amp; Room</h2>
+
+<div class="card">
+    <label>Room Type Name</label>
+    <input type="text" id="typeName">
+    <label>Price Per Night (LKR)</label>
+    <br><br>
+    <input type="number" id="price" step="0.01">
+     <br><br>
+    <label>Room Number</label>
+    <input type="text" id="roomNumber">
+    <button class="btn" onclick="addRoom()">Add Room</button>
+</div>
+
+<!-- ===== ROOM LIST ===== -->
+<h2>Available / Occupied Rooms</h2>
+
+<div class="card">
+<table class="data-table">
+<thead>
+<tr>
+    <th>ID</th>
+    <th>Room</th>
+    <th>Type</th>
+    <th>Price</th>
+    <th>Status</th>
+    <th>Action</th>
+</tr>
+</thead>
+<tbody id="roomTable"></tbody>
+</table>
+</div>
+
+</main>
+
+<footer class="footer">
+&copy; 2026 Ocean View Resort – Galle
+</footer>
+
+<script>
+function showSuccess(msg){
+    successBox.textContent = msg;
+    successBox.style.display = "block";
+    errorBox.style.display = "none";
+}
+
+function showError(msg){
+    errorBox.textContent = msg;
+    errorBox.style.display = "block";
+    successBox.style.display = "none";
+}
+
+/* ===== ADD ROOM ===== */
+function addRoom(){
+    const typeName = document.getElementById("typeName").value.trim();
+    const price = document.getElementById("price").value;
+    const roomNumber = document.getElementById("roomNumber").value.trim();
+
+    if(!typeName || !price || !roomNumber){
+        showError("All fields are required");
+        return;
+    }
+
+    fetch("admin/rooms",{
+        method:"POST",
+        headers:{"Content-Type":"application/x-www-form-urlencoded"},
+        body:
+          "action=add" +
+          "&typeName="+encodeURIComponent(typeName) +
+          "&price="+price +
+          "&roomNumber="+encodeURIComponent(roomNumber)
+    })
+    .then(r=>r.json())
+    .then(res=>{
+        if(res.success){
+            showSuccess(res.message);
+            loadRooms();
+        }else{
+            showError(res.message);
+        }
+    });
+}
+
+/* ===== LOAD ROOMS ===== */
+function loadRooms(){
+    fetch("admin/rooms")
+    .then(r=>r.json())
+    .then(data=>{
+        roomTable.innerHTML="";
+        data.forEach(r=>{
+            roomTable.innerHTML+=`
+            <tr>
+                <td>${r.id}</td>
+                <td>${r.number}</td>
+                <td>${r.type}</td>
+                <td>LKR ${r.price}</td>
+                <td class="${r.status==='AVAILABLE'?'status-available':'status-occupied'}">
+                    ${r.status}
+                </td>
+                <td>
+                    <button class="btn danger"
+                        onclick="deleteRoom(${r.id})">Delete</button>
+                </td>
+            </tr>`;
+        });
+    });
+}
+
+/* ===== DELETE ROOM ===== */
+function deleteRoom(id){
+    if(!confirm("Delete this room?")) return;
+
+    fetch("admin/rooms",{
+        method:"POST",
+        headers:{"Content-Type":"application/x-www-form-urlencoded"},
+        body:"action=delete&roomId="+id
+    })
+    .then(r=>r.json())
+    .then(res=>{
+        if(res.success){
+            showSuccess(res.message);
+            loadRooms();
+        }else{
+            showError(res.message);
+        }
+    });
+}
+
+loadRooms();
+</script>
+
+</body>
+</html>
