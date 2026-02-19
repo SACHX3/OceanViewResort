@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Room Status Management | Ocean View Resort</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+
+<!-- HEADER -->
+<header class="main-header">
+    <div class="header-content">
+        <h1>Ocean View Resort</h1>
+        <p>Room Status Management</p>
+    </div>
+    <a href="logout" class="logout-btn">Logout</a>
+</header>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="addReservation.html">Add Reservation</a>
+    <a href="viewReservation.html">View Reservation</a>
+    <a href="checkRooms.html" class="">Check Rooms</a>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="main-content">
+
+<!-- ===== STATUS MESSAGES ===== -->
+<div class="message success" id="successMsg" style="display:none;">
+   Room status updated successfully
+</div>
+
+<div class="message error" id="errorMsg" style="display:none;">
+   Failed to update room status
+</div>
+
+    <h2>Room Status Management</h2>
+    <p class="page-desc">
+        Manually update room status when guests check out.
+    </p>
+
+    <div class="card">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Room No</th>
+                    <th>Room Type</th>
+                    <th>Price (LKR)</th>
+                    <th>Current Status</th>
+                    <th>Update Status</th>
+                </tr>
+            </thead>
+            <tbody id="roomTable"></tbody>
+        </table>
+    </div>
+
+</main>
+
+<footer class="footer">
+    <p>&copy; 2026 Ocean View Resort – Galle</p>
+</footer>
+
+<script>
+/* ================= LOAD ROOM STATUS ================= */
+fetch("api/roomStatus")
+    .then(res => res.json())
+    .then(data => {
+
+        const table = document.getElementById("roomTable");
+        table.innerHTML = "";
+
+        if (!data || data.length === 0) {
+            table.innerHTML =
+                "<tr><td colspan='5'>No rooms found</td></tr>";
+            return;
+        }
+
+        data.forEach(room => {
+
+            const statusClass =
+                room.status === "AVAILABLE"
+                    ? "status-available"
+                    : "status-occupied";
+
+            table.innerHTML += `
+                <tr>
+                    <td>${room.roomNumber}</td>
+                    <td>${room.roomType}</td>
+                    <td>LKR ${room.price}</td>
+                    <td class="${statusClass}">
+                        ${room.status}
+                    </td>
+                    <td>
+                        <form method="post"
+                              action="updateRoomStatus"
+                              class="inline-form">
+
+                            <input type="hidden"
+                                   name="roomId"
+                                   value="${room.roomId}">
+
+                            <select name="status" class="status-select">
+                                <option value="AVAILABLE"
+                                  ${room.status==="AVAILABLE"?"selected":""}>
+                                  AVAILABLE
+                                </option>
+                                <option value="OCCUPIED"
+                                  ${room.status==="OCCUPIED"?"selected":""}>
+                                  OCCUPIED
+                                </option>
+                            </select>
+
+                            <button type="submit" class="btn danger">
+                                Update
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            `;
+        });
+    });
+
+/* ================= STATUS MESSAGE HANDLER ================= */
+const p = new URLSearchParams(window.location.search);
+
+if (p.get("success") === "true") {
+    document.getElementById("successMsg").style.display = "block";
+}
+
+if (p.get("error") === "true") {
+    document.getElementById("errorMsg").style.display = "block";
+}
+</script>
+
+</body>
+</html>
