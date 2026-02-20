@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Billing &amp; Check-Out | Ocean View Resort</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+<header class="main-header">
+<div class="header-content">
+    <h1>Ocean View Resort</h1>
+    <p>Billing &amp; Guest Check-Out</p>
+</div>
+<a href="logout" class="logout-btn">Logout</a>
+</header>
+
+<nav class="sidebar">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="addReservation.html">Add Reservation</a>
+    <a href="viewReservation.html">View Reservation</a>
+    <a href="checkRooms.html">Check Rooms</a>
+    <a href="bill.html" class="active">Calculate / Print Bill</a>
+</nav>
+
+<main class="main-content">
+
+<h2>Billing &amp; Guest Check-Out</h2>
+
+<p class="page-desc">
+    Revenue is recorded <b>only</b> when printing bills from the reservation list.
+</p>
+
+<!-- ===== SEARCH & PRINT (NO REVENUE) ===== -->
+<div class="card">
+    <h3>Search &amp; Print Bill (No Revenue)</h3>
+
+    <form onsubmit="searchPrint(); return false;">
+        <label>Reservation Number</label>
+        <input type="text" id="searchNumber"
+               placeholder="RES-XXXXXX" required>
+
+        <button class="btn secondary">
+            Print Bill
+        </button>
+    </form>
+</div>
+
+<!-- ===== ALL RESERVATIONS ===== -->
+<h3 style="margin-top:40px;">All Reservations</h3>
+
+<div class="card">
+<table class="data-table">
+<thead>
+<tr>
+    <th>Reservation No</th>
+    <th>Guest</th>
+    <th>Room</th>
+    <th>Room Type</th>
+    <th>Check-In</th>
+    <th>Check-Out</th>
+    <th>Status</th>
+    <th>Action</th>
+</tr>
+</thead>
+<tbody id="reservationTable"></tbody>
+</table>
+</div>
+
+<!-- ===== HIDDEN PRINT FORM ===== -->
+<form id="printForm"
+      action="calculateBill"
+      method="post"
+      style="display:none;">
+    <input type="hidden" name="reservationNumber" id="resNo">
+    <input type="hidden" name="recordRevenue" id="recordRevenue">
+</form>
+
+</main>
+
+<footer class="footer">
+    &copy; 2026 Ocean View Resort – Galle
+</footer>
+
+<script>
+/* ================= LOAD RESERVATIONS ================= */
+fetch("api/reservations")
+.then(res => res.json())
+.then(data => {
+
+    const tbody = document.getElementById("reservationTable");
+    tbody.innerHTML = "";
+
+    data.forEach(r => {
+
+        const out = r.status === "CHECKED_OUT";
+
+        tbody.innerHTML += `
+        <tr>
+            <td>${r.number}</td>
+            <td>${r.guest}</td>
+            <td>${r.room}</td>
+            <td>${r.roomType}</td>
+            <td>${r.checkIn}</td>
+            <td>${r.checkOut || "-"}</td>
+            <td>
+                <span class="${out ? 'badge success' : 'badge warning'}">
+                    ${r.status}
+                </span>
+            </td>
+            <td>
+                ${out ? `
+                    <button class="btn primary"
+                            onclick="tablePrint('${r.number}')">
+                        Print Bill
+                    </button>
+                ` : `
+                    <button class="btn danger"
+                            onclick="checkout('${r.number}')">
+                        Check Out
+                    </button>
+                `}
+            </td>
+        </tr>`;
+    });
+});
+
+/* ================= TABLE PRINT (REVENUE = YES) ================= */
+function tablePrint(number) {
+    document.getElementById("resNo").value = number;
+    document.getElementById("recordRevenue").value = "true";
+    document.getElementById("printForm").submit();
+}
+
+/* ================= SEARCH PRINT (REVENUE = NO) ================= */
+function searchPrint() {
+    document.getElementById("resNo").value =
+        document.getElementById("searchNumber").value.trim();
+    document.getElementById("recordRevenue").value = "false";
+    document.getElementById("printForm").submit();
+}
+
+/* ================= CHECK OUT ================= */
+function checkout(number) {
+
+    if (!confirm("Confirm guest check-out?")) return;
+
+    fetch("checkoutReservation", {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: "reservationNumber=" + number
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d.success) {
+            alert("Guest checked out successfully");
+            location.reload();
+        } else {
+            alert(d.message || "Check-out failed");
+        }
+    });
+}
+</script>
+
+</body>
+</html>
