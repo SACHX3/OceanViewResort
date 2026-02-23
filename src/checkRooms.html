@@ -1,130 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Room Status Management | Ocean View Resort</title>
-    <link rel="stylesheet" href="css/styles.css">
+<meta charset="UTF-8">
+<title>Room Status Management | Ocean View Resort</title>
+
+<link rel="stylesheet" href="css/styles.css">
+
+<!-- FontAwesome -->
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+
+</style>
+
 </head>
-<body>
 
+<body class="dark-body">
 
-<!-- HEADER -->
-<header class="main-header">
-    <div class="header-content">
-        <h1>Ocean View Resort</h1>
-        <p>Room Status Management</p>
+<!-- ===== HEADER ===== -->
+<header class="top-header">
+    <div class="logo">
+        <i class="fa-solid fa-hotel"></i> Ocean View Resort
     </div>
-    <a href="logout" class="logout-btn">Logout</a>
+    <a href="logout" class="logout-btn">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+    </a>
 </header>
 
-<!-- SIDEBAR -->
-<nav class="sidebar">
-    <a href="dashboard.html">Dashboard</a>
-    <a href="addReservation.html">Add Reservation</a>
-    <a href="viewReservation.html">View Reservation</a>
-    <a href="checkRooms.html" class="">Check Rooms</a>
-    <a href="bill.html">Calculate / Print Bill</a>
-</nav>
+<!-- ===== SIDEBAR ===== -->
+<aside class="sidebar-fixed">
+    <h3><i class="fa-solid fa-user-tie"></i> Staff Panel</h3>
 
-<!-- MAIN CONTENT -->
-<main class="main-content">
+    <a href="dashboard.html">
+        <i class="fa-solid fa-chart-line"></i> Dashboard
+    </a>
+
+    <a href="addReservation.html">
+        <i class="fa-solid fa-calendar-plus"></i> Add Reservation
+    </a>
+
+    <a href="viewReservation.html">
+        <i class="fa-solid fa-magnifying-glass"></i> View Reservation
+    </a>
+
+    <a href="checkRooms.html" class="active">
+        <i class="fa-solid fa-bed"></i> Rooms
+    </a>
+
+    <a href="bill.html">
+        <i class="fa-solid fa-file-invoice-dollar"></i> Billing
+    </a>
+
+    <a href="help.html">
+        <i class="fa-solid fa-circle-question"></i> Help
+    </a>
+</aside>
+
+<main class="dashboard-main">
 
 <!-- ===== STATUS MESSAGES ===== -->
 <div class="message success" id="successMsg" style="display:none;">
-   Room status updated successfully
+   <i class="fa-solid fa-circle-check"></i> Room status updated successfully
 </div>
 
 <div class="message error" id="errorMsg" style="display:none;">
-   Failed to update room status
+   <i class="fa-solid fa-triangle-exclamation"></i> Failed to update room status
 </div>
 
-    <h2>Room Status Management</h2>
-    <p class="page-desc">
-        Manually update room status when guests check out.
-    </p>
+<h2>
+<i class="fa-solid fa-bed"></i> Room Status Management
+</h2>
 
-    <div class="card">
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>Room No</th>
-                    <th>Room Type</th>
-                    <th>Price (LKR)</th>
-                    <th>Current Status</th>
-                    <th>Update Status</th>
-                </tr>
-            </thead>
-            <tbody id="roomTable"></tbody>
-        </table>
-    </div>
+<p class="page-desc">
+    Update room availability after guest check-out.
+</p>
+
+<div class="dashboard-card">
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Room No</th>
+            <th>Room Type</th>
+            <th>Price (LKR)</th>
+            <th>Status</th>
+            <th>Update</th>
+        </tr>
+    </thead>
+    <tbody id="roomTable"></tbody>
+</table>
+
+</div>
 
 </main>
 
-<footer class="footer">
-    <p>&copy; 2026 Ocean View Resort – Galle</p>
-</footer>
-
 <script>
-/* ================= LOAD ROOM STATUS ================= */
+
+/* ===== LOAD ROOM STATUS ===== */
 fetch("api/roomStatus")
-    .then(res => res.json())
-    .then(data => {
+.then(res => res.json())
+.then(data => {
 
-        const table = document.getElementById("roomTable");
-        table.innerHTML = "";
+    const table = document.getElementById("roomTable");
+    table.innerHTML = "";
 
-        if (!data || data.length === 0) {
-            table.innerHTML =
-                "<tr><td colspan='5'>No rooms found</td></tr>";
-            return;
-        }
+    if (!data || data.length === 0) {
+        table.innerHTML =
+            "<tr><td colspan='5'>No rooms found</td></tr>";
+        return;
+    }
 
-        data.forEach(room => {
+    data.forEach(room => {
 
-            const statusClass =
-                room.status === "AVAILABLE"
-                    ? "status-available"
-                    : "status-occupied";
+        const badgeClass =
+            room.status === "AVAILABLE"
+                ? "status-available"
+                : "status-occupied";
 
-            table.innerHTML += `
-                <tr>
-                    <td>${room.roomNumber}</td>
-                    <td>${room.roomType}</td>
-                    <td>LKR ${room.price}</td>
-                    <td class="${statusClass}">
+        table.innerHTML += `
+            <tr>
+                <td>${room.roomNumber}</td>
+                <td>${room.roomType}</td>
+                <td>LKR ${room.price}</td>
+                <td>
+                    <span class="status-badge ${badgeClass}">
                         ${room.status}
-                    </td>
-                    <td>
-                        <form method="post"
-                              action="updateRoomStatus"
-                              class="inline-form">
+                    </span>
+                </td>
+                <td>
+                    <form method="post"
+                          action="updateRoomStatus"
+                          class="inline-form">
 
-                            <input type="hidden"
-                                   name="roomId"
-                                   value="${room.roomId}">
+                        <input type="hidden"
+                               name="roomId"
+                               value="${room.roomId}">
 
-                            <select name="status" class="status-select">
-                                <option value="AVAILABLE"
-                                  ${room.status==="AVAILABLE"?"selected":""}>
-                                  AVAILABLE
-                                </option>
-                                <option value="OCCUPIED"
-                                  ${room.status==="OCCUPIED"?"selected":""}>
-                                  OCCUPIED
-                                </option>
-                            </select>
+                        <select name="status" class="status-select">
+                            <option value="AVAILABLE"
+                              ${room.status==="AVAILABLE"?"selected":""}>
+                              AVAILABLE
+                            </option>
+                            <option value="OCCUPIED"
+                              ${room.status==="OCCUPIED"?"selected":""}>
+                              OCCUPIED
+                            </option>
+                        </select>
 
-                            <button type="submit" class="btn danger">
-                                Update
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-            `;
-        });
+                        <button type="submit" class="btn danger">
+                            <i class="fa-solid fa-rotate"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        `;
     });
 
-/* ================= STATUS MESSAGE HANDLER ================= */
+})
+.catch(err => console.error("Room Load Error:", err));
+
 const p = new URLSearchParams(window.location.search);
 
 if (p.get("success") === "true") {
@@ -134,6 +169,7 @@ if (p.get("success") === "true") {
 if (p.get("error") === "true") {
     document.getElementById("errorMsg").style.display = "block";
 }
+
 </script>
 
 </body>

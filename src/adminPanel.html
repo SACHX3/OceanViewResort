@@ -1,62 +1,278 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Admin Panel | Ocean View Resort</title>
-    <link rel="stylesheet" href="css/styles.css">
-</head>
-<body>
+<meta charset="UTF-8">
+<title>Admin Dashboard | Ocean View Resort</title>
 
-<header class="main-header">
-    <div class="header-content">
-        <h1>Ocean View Resort</h1>
-        <p>Manage Rooms</p>
+<link rel="stylesheet" href="css/styles.css">
+
+<!-- FontAwesome -->
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- ChartJS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+</style>
+
+</head>
+
+<body class="dark-body">
+
+<!-- ===== HEADER ===== -->
+<header class="top-header">
+    <div class="logo">
+        <i class="fa-solid fa-hotel"></i> Ocean View Resort
     </div>
-    <a href="logout" class="logout-btn">Logout</a>
+    <a href="logout" class="logout-btn">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+    </a>
 </header>
 
-<nav class="sidebar">
-    <a href="adminPanel.html" class="">Admin Panel</a>
-    <a href="manageUsers.html">Manage Users</a>
-    <a href="adminRooms.html">Manage Rooms</a>
-</nav>
+<!-- ===== SIDEBAR ===== -->
+<aside class="sidebar-fixed">
+    <h3><i class="fa-solid fa-user-shield"></i> Admin Panel</h3>
 
-<main class="main-content">
-    <h2>Administration Functions</h2>
+    <a href="adminPanel.html" class="active">
+        <i class="fa-solid fa-chart-line"></i> Dashboard
+    </a>
 
-    <div class="card-grid">
+    <a href="manageUsers.html">
+        <i class="fa-solid fa-users"></i> Manage Users
+    </a>
 
-        <div class="card">
-            <h3>Manage Users</h3>
-            <p>Add, update, or remove Admin and Staff users.</p>
-            <a href="manageUsers.html" class="btn">Manage Users</a>
-        </div>
+    <a href="adminRooms.html">
+        <i class="fa-solid fa-bed"></i> Manage Rooms
+    </a>
+</aside>
 
+<main class="dashboard-main">
 
-        <div class="card">
-            <h3>Manage Rooms</h3>
-            <p>Maintain room data and availability.</p>
-            <a href="adminRooms.html" class="btn">Manage Rooms</a>
-        </div>
+<!-- ===== STAT CARDS ===== -->
+<div class="stat-grid">
 
-        <div class="card disabled">
-            <h3>System Reports</h3>
-            <p>Generate reservation and billing reports.</p>
-            <span class="coming-soon">Coming Soon</span>
-        </div>
-
-        <div class="card disabled">
-            <h3>Security Settings</h3>
-            <p>Review access control policies.</p>
-            <span class="coming-soon">Coming Soon</span>
-        </div>
-
+    <div class="stat-box blue">
+        <i class="fa-solid fa-calendar-check"></i>
+        <h2 id="dailyReservations">0</h2>
+        <p>New Booking</p>
     </div>
+
+    <div class="stat-box green">
+        <i class="fa-solid fa-bed"></i>
+        <h2 id="occupiedRooms">0</h2>
+        <p>Occupied Rooms</p>
+    </div>
+
+    <div class="stat-box blue">
+        <i class="fa-solid fa-door-open"></i>
+        <h2 id="availableRooms">0</h2>
+        <p>Available Rooms</p>
+    </div>
+
+    <div class="stat-box orange">
+        <i class="fa-solid fa-arrow-right-to-bracket"></i>
+        <h2 id="checkInToday">0</h2>
+        <p>Check In</p>
+    </div>
+
+    <div class="stat-box red">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        <h2 id="checkOutToday">0</h2>
+        <p>Check Out</p>
+    </div>
+
+</div>
+
+<!-- ===== CHART ROW ===== -->
+<div class="dashboard-row">
+
+    <div class="dashboard-card large">
+        <h3><i class="fa-solid fa-chart-area"></i> Revenue Trend (Last 7 Days)</h3>
+        <canvas id="revenueChart"></canvas>
+    </div>
+
+    <div class="dashboard-card small">
+        <h3><i class="fa-solid fa-chart-pie"></i> Check In vs Check Out</h3>
+        <canvas id="donutChart"></canvas>
+    </div>
+
+</div>
+
+<!-- ===== BOTTOM ROW ===== -->
+<div class="dashboard-row">
+
+    <!-- Occupancy Gauge -->
+    <div class="dashboard-card small">
+        <h3><i class="fa-solid fa-gauge-high"></i> Room Occupancy</h3>
+        <div class="gauge-container">
+            <canvas id="occupancyGauge"></canvas>
+            <div class="gauge-text" id="occupancyPercent">0%</div>
+        </div>
+    </div>
+
+    <!-- Revenue Summary -->
+    <div class="dashboard-card small">
+        <h3><i class="fa-solid fa-coins"></i> Revenue Summary</h3>
+
+        <div class="revenue-box">
+            <h4>Daily Revenue</h4>
+            <p id="dailyRevenue">0</p>
+        </div>
+
+        <div class="revenue-box">
+            <h4>Monthly Revenue</h4>
+            <p id="monthlyRevenue">0</p>
+        </div>
+    </div>
+
+</div>
+
 </main>
 
-<footer class="footer">
-    <p>&copy; 2026 Ocean View Resort – Galle</p>
-</footer>
+<script>
+let revenueChart=null,
+    donutChart=null,
+    occupancyGauge=null,
+    occupancySpark=null;
+
+const lastValues={};
+
+function animateCounter(id,newValue,duration=800){
+    const el=document.getElementById(id);
+    if(!el) return;
+
+    newValue=Number(newValue||0);
+    const oldValue=lastValues[id]??0;
+    if(oldValue===newValue) return;
+
+    lastValues[id]=newValue;
+
+    const startTime=performance.now();
+
+    function update(now){
+        const progress=Math.min((now-startTime)/duration,1);
+        const value=Math.floor(oldValue+(newValue-oldValue)*progress);
+        el.textContent=value.toLocaleString();
+        if(progress<1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+}
+
+function loadDashboard(){
+
+fetch("api/reports")
+.then(r=>r.json())
+.then(data=>{
+
+    animateCounter("dailyReservations",data.dailyReservations);
+    animateCounter("occupiedRooms",data.occupiedRooms);
+    animateCounter("availableRooms",data.availableRooms);
+    animateCounter("checkInToday",data.checkInToday);
+    animateCounter("checkOutToday",data.checkOutToday);
+
+    document.getElementById("dailyRevenue").textContent=
+        "LKR "+Number(data.dailyRevenue||0).toLocaleString();
+
+    document.getElementById("monthlyRevenue").textContent=
+        "LKR "+Number(data.monthlyRevenue||0).toLocaleString();
+
+    if(revenueChart) revenueChart.destroy();
+    revenueChart=new Chart(document.getElementById("revenueChart"),{
+        type:'line',
+        data:{
+            labels:data.revenueLabels||[],
+            datasets:[{
+                data:data.revenueChart||[],
+                borderColor:'#4f8cff',
+                backgroundColor:'rgba(79,140,255,0.2)',
+                fill:true,
+                tension:0.4
+            }]
+        },
+        options:{
+            animation:{duration:1200},
+            plugins:{legend:{display:false}}
+        }
+    });
+
+    if(donutChart) donutChart.destroy();
+    donutChart=new Chart(document.getElementById("donutChart"),{
+        type:'doughnut',
+        data:{
+            labels:["Check In","Check Out"],
+            datasets:[{
+                data:[data.checkInToday||0,data.checkOutToday||0],
+                backgroundColor:['#34d399','#ff6b6b'],
+                borderWidth:0
+            }]
+        },
+        options:{
+            cutout:"70%",
+            animation:{duration:900}
+        }
+    });
+
+    const occupied=data.occupiedRooms||0;
+    const available=data.availableRooms||0;
+    const total=occupied+available;
+    const percent=total?Math.round((occupied/total)*100):0;
+
+    document.getElementById("occupancyPercent").textContent=
+        percent+"%";
+
+    if(occupancyGauge) occupancyGauge.destroy();
+    occupancyGauge=new Chart(document.getElementById("occupancyGauge"),{
+        type:'doughnut',
+        data:{
+            datasets:[{
+                data:[percent,100-percent],
+                backgroundColor:['#34d399','#2c2c3a'],
+                borderWidth:0
+            }]
+        },
+        options:{
+            cutout:'75%',
+            animation:{
+                duration:1400,
+                easing:'easeOutQuart'
+            },
+            plugins:{legend:{display:false}}
+        }
+    });
+
+    if(occupancySpark) occupancySpark.destroy();
+    occupancySpark=new Chart(document.getElementById("occupancySparkline"),{
+        type:'line',
+        data:{
+            labels:data.revenueLabels||[],
+            datasets:[{
+                data:data.occupancyTrend||[],
+                borderColor:'#34d399',
+                backgroundColor:'rgba(52,211,153,0.15)',
+                fill:true,
+                tension:0.4,
+                pointRadius:0
+            }]
+        },
+        options:{
+            animation:{duration:800},
+            plugins:{legend:{display:false}},
+            scales:{x:{display:false},y:{display:false}}
+        }
+    });
+
+});
+}
+
+loadDashboard();
+setInterval(loadDashboard,10000);
+</script>
 
 </body>
+<footer class="dashboard-footer">
+    <p><strong>Authorized Staff & Admin Only</strong></p>
+    <p>© 2026 Ocean View Resort – Galle</p>
+</footer>
 </html>

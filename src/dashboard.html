@@ -1,148 +1,285 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Staff Dashboard | Ocean View Resort</title>
-    <link rel="stylesheet" href="css/styles.css">
+<meta charset="UTF-8">
+<title>Staff Dashboard | Ocean View Resort</title>
+
+<link rel="stylesheet" href="css/styles.css">
+
+<!-- FontAwesome -->
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- ChartJS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
-<body>
+
+<body class="dark-body">
 
 <!-- HEADER -->
-<header class="main-header">
-    <div class="header-content">
-        <h1>Ocean View Resort</h1>
-        <p>Staff Dashboard</p>
+<header class="top-header">
+    <div class="logo">
+        <i class="fa-solid fa-hotel"></i> Ocean View Resort
     </div>
-    <a href="logout" class="logout-btn">Logout</a>
+    <a href="logout" class="logout-btn">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+    </a>
 </header>
 
 <!-- SIDEBAR -->
-<nav class="sidebar">
-    <a href="dashboard.html" class="">Dashboard</a>
-    <a href="addReservation.html">Add Reservation</a>
-    <a href="viewReservation.html">View Reservation</a>
-    <a href="checkRooms.html">Check Rooms</a>
-    <a href="bill.html">Calculate / Print Bill</a>
-</nav>
+<aside class="sidebar-fixed">
+    <h3><i class="fa-solid fa-user-tie"></i> Staff Panel</h3>
 
-<!-- MAIN CONTENT -->
-<main class="main-content">
+    <a href="dashboard.html" class="active">
+        <i class="fa-solid fa-chart-line"></i> Dashboard
+    </a>
+    <a href="addReservation.html">
+        <i class="fa-solid fa-calendar-plus"></i> Add Reservation
+    </a>
+    <a href="viewReservation.html">
+        <i class="fa-solid fa-magnifying-glass"></i> View Reservation
+    </a>
+    <a href="checkRooms.html">
+        <i class="fa-solid fa-bed"></i> Rooms
+    </a>
+    <a href="bill.html">
+        <i class="fa-solid fa-file-invoice-dollar"></i> Billing
+    </a>
+    <a href="help.html">
+        <i class="fa-solid fa-circle-question"></i> Help
+    </a>
+</aside>
 
-    <h2>Staff Dashboard</h2>
-    <p class="page-desc">
-        Real-time operational summary of the resort.
-    </p>
+<main class="dashboard-main">
 
-    <!-- ===== DASHBOARD STATS ===== -->
-    <div class="dashboard-cards">
+<!-- ===== STAT CARDS ===== -->
+<div class="stat-grid">
 
-        <div class="stat-card">
-            <h3>Daily Reservations</h3>
-            <p id="dailyReservations">0</p>
-        </div>
+    <div class="stat-box blue">
+        <i class="fa-solid fa-calendar-check"></i>
+        <h2 id="dailyReservations">0</h2>
+        <p>New Booking</p>
+    </div>
 
-        <div class="stat-card">
-            <h3>Guests Check-In Today</h3>
-            <p id="checkInToday">0</p>
-        </div>
-        
-        <div class="stat-card">
-    <h3>Guests Check-Out Today</h3>
-    <p id="checkOutToday">0</p>
+    <div class="stat-box green">
+        <i class="fa-solid fa-bed"></i>
+        <h2 id="occupiedRooms">0</h2>
+        <p>Occupied Rooms</p>
+    </div>
+
+    <div class="stat-box blue">
+        <i class="fa-solid fa-door-open"></i>
+        <h2 id="availableRooms">0</h2>
+        <p>Available Rooms</p>
+    </div>
+
+    <div class="stat-box orange">
+        <i class="fa-solid fa-arrow-right-to-bracket"></i>
+        <h2 id="checkInToday">0</h2>
+        <p>Check In</p>
+    </div>
+
+    <div class="stat-box red">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        <h2 id="checkOutToday">0</h2>
+        <p>Check Out</p>
+    </div>
+
 </div>
-        
 
-        <div class="stat-card">
-            <h3>Occupied Rooms</h3>
-            <p id="occupiedRooms">0</p>
+<!-- ===== CHART ROW ===== -->
+<div class="dashboard-row">
+
+    <div class="dashboard-card large">
+        <h3><i class="fa-solid fa-chart-area"></i> Revenue Trend (Last 7 Days)</h3>
+        <canvas id="revenueChart"></canvas>
+    </div>
+
+    <div class="dashboard-card small">
+        <h3><i class="fa-solid fa-chart-pie"></i> Check In vs Check Out</h3>
+        <canvas id="donutChart"></canvas>
+    </div>
+
+</div>
+
+<!-- ===== BOTTOM ROW ===== -->
+<div class="dashboard-row">
+
+    <div class="dashboard-card small">
+        <h3><i class="fa-solid fa-gauge-high"></i> Room Occupancy</h3>
+
+        <div class="gauge-container">
+            <canvas id="occupancyGauge"></canvas>
+            <div class="gauge-text" id="occupancyPercent">0%</div>
         </div>
 
-        <div class="stat-card">
-            <h3>Daily Revenue (LKR)</h3>
+        <div class="sparkline-wrap">
+            <canvas id="occupancySparkline" height="60"></canvas>
+        </div>
+    </div>
+
+    <div class="dashboard-card small">
+        <h3><i class="fa-solid fa-coins"></i> Revenue Summary</h3>
+
+        <div class="revenue-box">
+            <h4>Daily Revenue</h4>
             <p id="dailyRevenue">0</p>
         </div>
 
-        <div class="stat-card">
-            <h3>Monthly Revenue (LKR)</h3>
+        <div class="revenue-box">
+            <h4>Monthly Revenue</h4>
             <p id="monthlyRevenue">0</p>
         </div>
-
     </div>
 
-    <!-- ===== STAFF FUNCTIONS ===== -->
-    <h2 style="margin-top:40px;">Staff Functions</h2>
-
-    <div class="card-grid">
-
-        <div class="card">
-            <h3>Add Reservation</h3>
-            <p>Create new guest reservations.</p>
-            <a href="addReservation.html" class="btn">Add Reservation</a>
-        </div>
-
-        <div class="card">
-            <h3>View Reservation</h3>
-            <p>Search and view reservation details.</p>
-            <a href="viewReservation.html" class="btn">View Reservation</a>
-        </div>
-
-        <div class="card">
-            <h3>Check Available Rooms</h3>
-            <p>View and update room availability.</p>
-            <a href="checkRooms.html" class="btn">Check Rooms</a>
-        </div>
-
-        <div class="card">
-            <h3>Billing</h3>
-            <p>Calculate and print guest bills.</p>
-            <a href="bill.html" class="btn">Calculate Bill</a>
-        </div>
-
-        <div class="card">
-            <h3>Help</h3>
-            <p>System usage guide and support.</p>
-            <a href="help.html" class="btn">Help</a>
-        </div>
-
-    </div>
+</div>
 
 </main>
 
-<!-- FOOTER -->
-<footer class="footer">
-    <p>&copy; 2026 Ocean View Resort – Galle</p>
-</footer>
-
-<!-- ===== DASHBOARD DATA SCRIPT ===== -->
 <script>
+let revenueChart=null,
+    donutChart=null,
+    occupancyGauge=null,
+    occupancySpark=null;
+
+const lastValues={};
+
+function animateCounter(id,newValue,duration=800){
+    const el=document.getElementById(id);
+    if(!el) return;
+
+    newValue=Number(newValue||0);
+    const oldValue=lastValues[id]??0;
+    if(oldValue===newValue) return;
+
+    lastValues[id]=newValue;
+
+    const startTime=performance.now();
+
+    function update(now){
+        const progress=Math.min((now-startTime)/duration,1);
+        const value=Math.floor(oldValue+(newValue-oldValue)*progress);
+        el.textContent=value.toLocaleString();
+        if(progress<1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+}
+
+function loadDashboard(){
+
 fetch("api/reports")
-    .then(res => res.json())
-    .then(data => {
+.then(r=>r.json())
+.then(data=>{
 
-        document.getElementById("dailyReservations").textContent =
-            data.dailyReservations ?? 0;
+    animateCounter("dailyReservations",data.dailyReservations);
+    animateCounter("occupiedRooms",data.occupiedRooms);
+    animateCounter("availableRooms",data.availableRooms);
+    animateCounter("checkInToday",data.checkInToday);
+    animateCounter("checkOutToday",data.checkOutToday);
 
-        document.getElementById("dailyRevenue").textContent =
-            (data.dailyRevenue ?? 0).toLocaleString();
+    document.getElementById("dailyRevenue").textContent=
+        "LKR "+Number(data.dailyRevenue||0).toLocaleString();
 
-        document.getElementById("monthlyRevenue").textContent =
-            (data.monthlyRevenue ?? 0).toLocaleString();
+    document.getElementById("monthlyRevenue").textContent=
+        "LKR "+Number(data.monthlyRevenue||0).toLocaleString();
 
-        document.getElementById("occupiedRooms").textContent =
-            data.occupiedRooms ?? 0;
-
-        document.getElementById("checkInToday").textContent =
-            data.checkInToday ?? 0;
-        
-        document.getElementById("checkOutToday").textContent =
-            data.checkOutToday ?? 0;
-
-
-    })
-    .catch(err => {
-        console.error("Failed to load dashboard data", err);
+    if(revenueChart) revenueChart.destroy();
+    revenueChart=new Chart(document.getElementById("revenueChart"),{
+        type:'line',
+        data:{
+            labels:data.revenueLabels||[],
+            datasets:[{
+                data:data.revenueChart||[],
+                borderColor:'#4f8cff',
+                backgroundColor:'rgba(79,140,255,0.2)',
+                fill:true,
+                tension:0.4
+            }]
+        },
+        options:{
+            animation:{duration:1200},
+            plugins:{legend:{display:false}}
+        }
     });
+
+    if(donutChart) donutChart.destroy();
+    donutChart=new Chart(document.getElementById("donutChart"),{
+        type:'doughnut',
+        data:{
+            labels:["Check In","Check Out"],
+            datasets:[{
+                data:[data.checkInToday||0,data.checkOutToday||0],
+                backgroundColor:['#34d399','#ff6b6b'],
+                borderWidth:30,
+                borderColor:'transparent'
+            }]
+        },
+        options:{
+            cutout:"70%",
+            animation:{duration:900}
+        }
+    });
+
+    const occupied=data.occupiedRooms||0;
+    const available=data.availableRooms||0;
+    const total=occupied+available;
+    const percent=total?Math.round((occupied/total)*100):0;
+
+    document.getElementById("occupancyPercent").textContent=
+        percent+"%";
+
+    if(occupancyGauge) occupancyGauge.destroy();
+    occupancyGauge=new Chart(document.getElementById("occupancyGauge"),{
+        type:'doughnut',
+        data:{
+            datasets:[{
+                data:[percent,100-percent],
+                backgroundColor:['#34d399','#2c2c3a'],
+                borderWidth:0
+            }]
+        },
+        options:{
+            cutout:'75%',
+            animation:{
+                duration:1400,
+                easing:'easeOutQuart'
+            },
+            plugins:{legend:{display:false}}
+        }
+    });
+
+    if(occupancySpark) occupancySpark.destroy();
+    occupancySpark=new Chart(document.getElementById("occupancySparkline"),{
+        type:'line',
+        data:{
+            labels:data.revenueLabels||[],
+            datasets:[{
+                data:data.occupancyTrend||[],
+                borderColor:'#34d399',
+                backgroundColor:'rgba(52,211,153,0.15)',
+                fill:true,
+                tension:0.4,
+                pointRadius:0
+            }]
+        },
+        options:{
+            animation:{duration:800},
+            plugins:{legend:{display:false}},
+            scales:{x:{display:false},y:{display:false}}
+        }
+    });
+
+});
+}
+
+loadDashboard();
+setInterval(loadDashboard,10000);
 </script>
 
 </body>
+<footer class="dashboard-footer">
+    <p><strong>Authorized Staff & Admin Only</strong></p>
+    <p>© 2026 Ocean View Resort – Galle</p>
+</footer>
 </html>

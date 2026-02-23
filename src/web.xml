@@ -22,19 +22,8 @@
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/login</url-pattern>
     </servlet-mapping>
-
-    <!-- Logout Servlet -->
-    <servlet>
-        <servlet-name>LogoutServlet</servlet-name>
-        <servlet-class>com.oceanview.controller.LogoutServlet</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>LogoutServlet</servlet-name>
-        <url-pattern>/logout</url-pattern>
-    </servlet-mapping>
-
-    <!-- Reservation -->
+    
+<!-- Reservation -->
     <servlet>
         <servlet-name>AddReservationServlet</servlet-name>
         <servlet-class>com.oceanview.controller.AddReservationServlet</servlet-class>
@@ -55,9 +44,21 @@
         <url-pattern>/viewReservation</url-pattern>
     </servlet-mapping>
 
+    <!-- Billing -->
+    <servlet>
+        <servlet-name>CalculateBillServlet</servlet-name>
+        <servlet-class>com.oceanview.controller.CalculateBillServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>CalculateBillServlet</servlet-name>
+        <url-pattern>/calculateBill</url-pattern>
+    </servlet-mapping>
+
     <!-- Welcome Page -->
     <welcome-file-list>
         <welcome-file>login.html</welcome-file>
     </welcome-file-list>
 
 </web-app>
+

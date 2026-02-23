@@ -6,231 +6,276 @@
 
 <link rel="stylesheet" href="css/styles.css">
 
+<!-- FontAwesome -->
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <style>
-/* ===== SCREEN VIEW  ===== */
-.bill-box {
-    max-width: 700px;
-    margin: 40px auto;
-    padding: 30px;
-    border: 2px solid #1e90ff;
-    background: #fff;
+
+/* ===== BILL CARD DARK STYLE ===== */
+.bill-card{
+    max-width:800px;
+    margin:auto;
 }
 
-.bill-header {
-    text-align: center;
+.bill-box{
+    background:#1e1e2f;
+    border:1px solid #2c2c3a;
+    border-radius:12px;
+    padding:30px;
 }
 
-.bill-header h1 {
-    margin-bottom: 5px;
+.bill-header{
+    text-align:center;
+    margin-bottom:20px;
 }
 
-.bill-header p {
-    font-size: 14px;
+.bill-header h1{
+    margin:0;
+    font-size:22px;
 }
 
-.bill-row {
-    display: flex;
-    justify-content: space-between;
-    margin: 8px 0;
+.bill-header p{
+    opacity:0.7;
+    font-size:19px;
 }
 
-.bill-total {
-    font-size: 20px;
-    font-weight: bold;
-    text-align: center;
-    margin-top: 20px;
+.bill-row{
+    display:flex;
+    justify-content:space-between;
+    padding:8px 0;
+    border-bottom:1px solid #2c2c3a;
+    font-size:19px;
 }
 
-/* ===== PRINT VIEW ===== */
-@media print {
+.bill-total{
+    font-size:28px;
+    font-weight:bold;
+    text-align:center;
+    margin-top:20px;
+    color:#34d399;
+}
 
-    /* Hide everything */
-    body * {
-        visibility: hidden;
+.print-btn{
+    text-align:center;
+    margin-top:25px;
+}
+
+/* ===== PRINT MODE ===== */
+@media print{
+
+    body *{
+        visibility:hidden;
     }
 
-    /* Show only bill */
     .bill-box,
-    .bill-box * {
-        visibility: visible;
+    .bill-box *{
+        visibility:visible;
     }
 
-    /* ✅ HIDE PRINT BUTTON */
-    .print-btn {
-        display: none !important;
+    .bill-box{
+        position:fixed;
+        inset:0;
+        background:#fff;
+        color:#000;
+        border:none;
+        border-radius:0;
+    }
+    
+    
+    .bill-header h1{
+    margin:0;
+    font-size:22px;
+}
+
+.bill-header p{
+    font-size:13px;
+}
+
+.bill-row{
+    font-size:14px;
+}
+
+.bill-total{
+    font-size:20px;
+}
+    
+    
+    .bill-row{
+    border-bottom:1px solid #fbfbfb;
+}
+
+    .print-btn,
+    header,
+    aside,
+    footer{
+        display:none !important;
     }
 
-    /* Center bill and remove spacing */
-    .bill-box {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-
-        margin: 0;
-        width: 100%;
-        max-width: 700px;
-        padding: 30px;
-
-        border: 2px solid #000;
-        box-shadow: none;
-    }
-
-    body {
-        margin: 0;
-        padding: 0;
-        background: #fff;
-    }
-
-    @page {
-        margin: 0;
+    @page{
+        margin:20px;
     }
 }
 
 </style>
-
-
 </head>
-<body>
 
-<header class="main-header">
-<div class="header-content">
-    <h1>Ocean View Resort</h1>
-    <p>Print Bill</p>
+<body class="dark-body">
+
+<!-- ===== HEADER ===== -->
+<header class="top-header">
+    <div class="logo">
+        <i class="fa-solid fa-hotel"></i> Ocean View Resort
     </div>
+    <a href="logout" class="logout-btn">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+    </a>
 </header>
 
-<nav class="sidebar">
-    <a href="dashboard.html">Dashboard</a>
-    <a href="addReservation.html">Add Reservation</a>
-    <a href="viewReservation.html">View Reservation</a>
-    <a href="checkRooms.html">Check Rooms</a>
-    <a href="bill.html" class="">Calculate / Print Bill</a>
-</nav>
-<main class="main-content">
+<!-- ===== SIDEBAR ===== -->
+<aside class="sidebar-fixed">
+    <h3><i class="fa-solid fa-user-tie"></i> Staff Panel</h3>
+
+    <a href="dashboard.html">
+        <i class="fa-solid fa-chart-line"></i> Dashboard
+    </a>
+
+    <a href="addReservation.html">
+        <i class="fa-solid fa-calendar-plus"></i> Add Reservation
+    </a>
+
+    <a href="viewReservation.html">
+        <i class="fa-solid fa-magnifying-glass"></i> View Reservation
+    </a>
+
+    <a href="checkRooms.html">
+        <i class="fa-solid fa-bed"></i> Rooms
+    </a>
+
+    <a href="bill.html" class="active">
+        <i class="fa-solid fa-file-invoice-dollar"></i> Billing
+    </a>
+
+    <a href="help.html">
+        <i class="fa-solid fa-circle-question"></i> Help
+    </a>
+</aside>
+
+<!-- ===== MAIN CONTENT ===== -->
+<main class="dashboard-main">
+
+<h2>
+<i class="fa-solid fa-receipt"></i> Guest Bill
+</h2>
+
+<div class="dashboard-card bill-card">
 
 <div class="bill-box">
 
     <div class="bill-header">
         <h1>Ocean View Resort</h1>
         <p>Galle, Sri Lanka</p>
-        <p><strong>Guest Bill</strong></p>
-        <hr>
+        <p><strong>Guest Invoice</strong></p>
     </div>
 
     <div class="bill-row">
-        <span>Reservation Number:</span>
+        <span>Reservation Number</span>
         <span id="resNo"></span>
     </div>
 
     <div class="bill-row">
-        <span>Guest Name:</span>
+        <span>Guest Name</span>
         <span id="guest"></span>
     </div>
 
     <div class="bill-row">
-        <span>Room:</span>
+        <span>Room</span>
         <span id="room"></span>
     </div>
 
     <div class="bill-row">
-        <span>Room Type:</span>
+        <span>Room Type</span>
         <span id="type"></span>
     </div>
 
     <div class="bill-row">
-        <span>Price / Day:</span>
+        <span>Price / Night</span>
         <span>LKR <span id="price"></span></span>
     </div>
 
-    <hr>
-
     <div class="bill-row">
-        <span>Check-in Date:</span>
+        <span>Check-in Date</span>
         <span id="checkIn"></span>
     </div>
 
     <div class="bill-row">
-        <span>Check-out Date:</span>
+        <span>Check-out Date</span>
         <span id="checkOut"></span>
     </div>
 
     <div class="bill-row">
-        <span>Day</span>
+        <span>Total Nights</span>
         <span id="nights"></span>
     </div>
-
-    <hr>
 
     <div class="bill-total">
         Total Amount: LKR <span id="total"></span>
     </div>
 
-    <p style="margin-top:20px;font-size:13px;text-align:center">
+    <p style="text-align:center;margin-top:15px;font-size:12px;opacity:0.6">
         Generated on: <span id="date"></span>
     </p>
 
-    <div class="print-btn" style="text-align:center;margin-top:30px;">
-        <button class="btn" onclick="window.print()">🖨 Print Bill</button>
+    <div class="print-btn">
+        <button class="btn">
+            <i class="fa-solid fa-print"></i> Print Bill
+        </button>
     </div>
 
+</div>
 </div>
 
 </main>
 
+<!-- ===== FOOTER ===== -->
 <footer class="footer">
-    &copy; 2026 Ocean View Resort – Galle
+    <strong>Authorized Staff & Admin Only</strong><br>
+    © 2026 Ocean View Resort – Galle
 </footer>
 
 <script>
+
+document.querySelector(".print-btn button")
+.addEventListener("click", () => window.print());
+
 fetch("api/bill")
 .then(res => res.json())
 .then(b => {
 
     if (!b || !b.reservationNumber) {
-        alert("Bill data not found. Please calculate the bill again.");
+        alert("Bill data not found.");
         window.location.href = "bill.html";
         return;
     }
 
-    document.getElementById("resNo").textContent =
-        b.reservationNumber;
+    resNo.textContent = b.reservationNumber;
+    guest.textContent = b.guestName;
+    room.textContent = b.roomNumber;
+    type.textContent = b.roomType;
+    price.textContent = Number(b.pricePerNight).toLocaleString();
+    checkIn.textContent = b.checkIn;
+    checkOut.textContent = b.checkOut;
+    nights.textContent = b.nights;
+    total.textContent = Number(b.totalAmount).toLocaleString();
+    date.textContent = new Date().toLocaleString();
 
-    document.getElementById("guest").textContent =
-        b.guestName;
-
-    /* ✅ FIXED */
-    document.getElementById("room").textContent =
-        b.roomNumber;
-
-    document.getElementById("type").textContent =
-        b.roomType;
-
-    document.getElementById("price").textContent =
-        Number(b.pricePerNight).toLocaleString();
-
-    document.getElementById("checkIn").textContent =
-        b.checkIn;
-
-    document.getElementById("checkOut").textContent =
-        b.checkOut;
-
-    document.getElementById("nights").textContent =
-        b.nights;
-
-    document.getElementById("total").textContent =
-        Number(b.totalAmount).toLocaleString();
-
-    document.getElementById("date").textContent =
-        new Date().toLocaleString();
 })
 .catch(err => {
-    console.error("Failed to load bill", err);
+    console.error("Bill load error:", err);
     alert("Failed to load bill details");
 });
+
 </script>
-
-
 
 </body>
 </html>

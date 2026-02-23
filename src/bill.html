@@ -2,55 +2,90 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Billing &amp; Check-Out | Ocean View Resort</title>
+<title>Billing & Check-Out | Ocean View Resort</title>
+
 <link rel="stylesheet" href="css/styles.css">
+
+<!-- FontAwesome -->
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+
 </head>
 
-<body>
+<body class="dark-body">
 
-<header class="main-header">
-<div class="header-content">
-    <h1>Ocean View Resort</h1>
-    <p>Billing &amp; Guest Check-Out</p>
-</div>
-<a href="logout" class="logout-btn">Logout</a>
+<!-- ===== HEADER ===== -->
+<header class="top-header">
+    <div class="logo">
+        <i class="fa-solid fa-hotel"></i> Ocean View Resort
+    </div>
+    <a href="logout" class="logout-btn">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+    </a>
 </header>
 
-<nav class="sidebar">
-    <a href="dashboard.html">Dashboard</a>
-    <a href="addReservation.html">Add Reservation</a>
-    <a href="viewReservation.html">View Reservation</a>
-    <a href="checkRooms.html">Check Rooms</a>
-    <a href="bill.html" class="active">Calculate / Print Bill</a>
-</nav>
+<!-- ===== SIDEBAR ===== -->
+<aside class="sidebar-fixed">
+    <h3><i class="fa-solid fa-user-tie"></i> Staff Panel</h3>
 
-<main class="main-content">
+    <a href="dashboard.html">
+        <i class="fa-solid fa-chart-line"></i> Dashboard
+    </a>
 
-<h2>Billing &amp; Guest Check-Out</h2>
+    <a href="addReservation.html">
+        <i class="fa-solid fa-calendar-plus"></i> Add Reservation
+    </a>
+
+    <a href="viewReservation.html">
+        <i class="fa-solid fa-magnifying-glass"></i> View Reservation
+    </a>
+
+    <a href="checkRooms.html">
+        <i class="fa-solid fa-bed"></i> Rooms
+    </a>
+
+    <a href="bill.html" class="active">
+        <i class="fa-solid fa-file-invoice-dollar"></i> Billing
+    </a>
+
+    <a href="help.html">
+        <i class="fa-solid fa-circle-question"></i> Help
+    </a>
+</aside>
+
+<main class="dashboard-main">
+
+<h2>
+<i class="fa-solid fa-receipt"></i> Billing & Guest Check-Out
+</h2>
 
 <p class="page-desc">
-    Revenue is recorded <b>only</b> when printing bills from the reservation list.
+Revenue is recorded <strong>only</strong> when printing bills after guest check-out.
 </p>
 
-<!-- ===== SEARCH & PRINT (NO REVENUE) ===== -->
-<div class="card">
-    <h3>Search &amp; Print Bill (No Revenue)</h3>
+<!-- ===== SEARCH SECTION ===== -->
+<div class="dashboard-card">
+    <h3><i class="fa-solid fa-magnifying-glass-dollar"></i> Search & Print Bill</h3>
 
-    <form onsubmit="searchPrint(); return false;">
-        <label>Reservation Number</label>
-        <input type="text" id="searchNumber"
-               placeholder="RES-XXXXXX" required>
+    <form onsubmit="searchPrint(); return false;" class="search-box">
+        <input type="text"
+               id="searchNumber"
+               placeholder="Enter Reservation Number (RES-XXXXXX)"
+               required>
 
-        <button class="btn secondary">
-            Print Bill
+        <button class="btn primary">
+            <i class="fa-solid fa-print"></i> Print
         </button>
     </form>
 </div>
 
-<!-- ===== ALL RESERVATIONS ===== -->
-<h3 style="margin-top:40px;">All Reservations</h3>
+<!-- ===== RESERVATION LIST ===== -->
+<h3 style="margin-top:40px;">
+<i class="fa-solid fa-list"></i> All Reservations
+</h3>
 
-<div class="card">
+<div class="dashboard-card">
 <table class="data-table">
 <thead>
 <tr>
@@ -68,7 +103,7 @@
 </table>
 </div>
 
-<!-- ===== HIDDEN PRINT FORM ===== -->
+<!-- Hidden Print Form -->
 <form id="printForm"
       action="calculateBill"
       method="post"
@@ -79,12 +114,9 @@
 
 </main>
 
-<footer class="footer">
-    &copy; 2026 Ocean View Resort – Galle
-</footer>
-
 <script>
-/* ================= LOAD RESERVATIONS ================= */
+
+/* ===== LOAD RESERVATIONS ===== */
 fetch("api/reservations")
 .then(res => res.json())
 .then(data => {
@@ -92,9 +124,19 @@ fetch("api/reservations")
     const tbody = document.getElementById("reservationTable");
     tbody.innerHTML = "";
 
+    if (!data || data.length === 0) {
+        tbody.innerHTML =
+            "<tr><td colspan='8'>No reservations found</td></tr>";
+        return;
+    }
+
     data.forEach(r => {
 
-        const out = r.status === "CHECKED_OUT";
+        const checkedOut = r.status === "CHECKED_OUT";
+
+        const badgeClass = checkedOut
+            ? "status-badge status-success"
+            : "status-badge status-warning";
 
         tbody.innerHTML += `
         <tr>
@@ -105,43 +147,44 @@ fetch("api/reservations")
             <td>${r.checkIn}</td>
             <td>${r.checkOut || "-"}</td>
             <td>
-                <span class="${out ? 'badge success' : 'badge warning'}">
+                <span class="${badgeClass}">
                     ${r.status}
                 </span>
             </td>
             <td>
-                ${out ? `
+                ${checkedOut ? `
                     <button class="btn primary"
                             onclick="tablePrint('${r.number}')">
-                        Print Bill
+                        <i class="fa-solid fa-print"></i>
                     </button>
                 ` : `
                     <button class="btn danger"
                             onclick="checkout('${r.number}')">
-                        Check Out
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
                     </button>
                 `}
             </td>
         </tr>`;
     });
-});
 
-/* ================= TABLE PRINT (REVENUE = YES) ================= */
+})
+.catch(err => console.error("Reservation Load Error:", err));
+
 function tablePrint(number) {
     document.getElementById("resNo").value = number;
     document.getElementById("recordRevenue").value = "true";
     document.getElementById("printForm").submit();
 }
 
-/* ================= SEARCH PRINT (REVENUE = NO) ================= */
 function searchPrint() {
     document.getElementById("resNo").value =
         document.getElementById("searchNumber").value.trim();
+
     document.getElementById("recordRevenue").value = "false";
     document.getElementById("printForm").submit();
 }
 
-/* ================= CHECK OUT ================= */
+
 function checkout(number) {
 
     if (!confirm("Confirm guest check-out?")) return;
@@ -153,14 +196,18 @@ function checkout(number) {
     })
     .then(r => r.json())
     .then(d => {
+
         if (d.success) {
             alert("Guest checked out successfully");
             location.reload();
         } else {
             alert(d.message || "Check-out failed");
         }
-    });
+
+    })
+    .catch(err => console.error("Checkout Error:", err));
 }
+
 </script>
 
 </body>
