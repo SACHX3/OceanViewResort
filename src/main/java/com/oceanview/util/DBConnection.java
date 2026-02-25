@@ -8,22 +8,15 @@ import java.sql.SQLException;
  * DBConnection
  * ----------------------------------------------------
  * Singleton for database configuration.
- * Provides a NEW JDBC Connection per request.
+ * Supports:
+ *  - Local Development
+ *  - GitHub CI (Environment Variables)
  *
  * Java 17 | Tomcat 9 | MySQL 8.x
  */
 public class DBConnection {
 
     private static DBConnection instance;
-
-    private static final String URL =
-            "jdbc:mysql://localhost:3306/ocean_view_reservation"
-            + "?useSSL=false"
-            + "&allowPublicKeyRetrieval=true"
-            + "&serverTimezone=UTC";
-
-    private static final String USER = "root";
-    private static final String PASSWORD = "";
 
     private DBConnection() {
         try {
@@ -41,6 +34,19 @@ public class DBConnection {
     }
 
     public Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL, USER, PASSWORD);
+
+        // Read from environment (GitHub CI compatible)
+        String host = System.getenv().getOrDefault("DB_HOST", "localhost");
+        String port = System.getenv().getOrDefault("DB_PORT", "3306");
+        String db   = System.getenv().getOrDefault("DB_NAME", "ocean_view_reservation");
+        String user = System.getenv().getOrDefault("DB_USER", "root");
+        String pass = System.getenv().getOrDefault("DB_PASS", "");
+
+        String url = "jdbc:mysql://" + host + ":" + port + "/" + db
+                + "?useSSL=false"
+                + "&allowPublicKeyRetrieval=true"
+                + "&serverTimezone=UTC";
+
+        return DriverManager.getConnection(url, user, pass);
     }
 }

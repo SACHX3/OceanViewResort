@@ -1,4 +1,4 @@
-name: CI (Maven)
+name: CI (Maven + MySQL)
 
 on:
   push:
@@ -24,22 +24,40 @@ jobs:
           --health-timeout=5s
           --health-retries=10
 
-    steps:
-      - uses: actions/checkout@v4
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_NAME: ocean_view_reservation
+      DB_USER: root
+      DB_PASS: root
 
-      - name: Set up JDK
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: "temurin"
-          java-version: "17"
-          cache: "maven"
+          distribution: temurin
+          java-version: 17
+          cache: maven
 
-      - name: Wait for MySQL
+      - name: Wait for MySQL to be ready
         run: |
           for i in {1..30}; do
             mysqladmin ping -h 127.0.0.1 -proot && break
             sleep 2
           done
 
-      - name: Build (skip tests for now)
-        run: mvn -B clean package -DskipTests
+      - name: Load Database Schema
+        run: |
+          mysql -h 127.0.0.1 -uroot -proot ocean_view_reservation < src/test/resources/database/schema.sql
+
+      - name: Build and Run Tests
+        run: mvn -B clean verify
+
+      - name: Show Test Results (Debug)
+        if: always()
+        run: |
+          ls target/surefire-reports || true
+          cat target/surefire-reports/*.txt || true
