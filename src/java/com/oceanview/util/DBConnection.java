@@ -25,21 +25,14 @@ public class DBConnection {
     private static final String USER = "root";
     private static final String PASSWORD = "";
 
-    /**
-     * Private constructor loads JDBC driver once.
-     */
     private DBConnection() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            System.out.println("✅ MySQL JDBC Driver loaded");
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("❌ MySQL JDBC Driver not found", e);
+            throw new RuntimeException("MySQL JDBC Driver not found", e);
         }
     }
 
-    /**
-     * Returns singleton instance.
-     */
     public static synchronized DBConnection getInstance() {
         if (instance == null) {
             instance = new DBConnection();
@@ -47,9 +40,6 @@ public class DBConnection {
         return instance;
     }
 
-    /**
-     * ALWAYS returns a NEW, OPEN connection.
-     */
     public Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
