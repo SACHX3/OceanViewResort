@@ -15,7 +15,7 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: oceanview
+          MYSQL_DATABASE: ocean_view_reservation
         ports:
           - 3306:3306
         options: >-
