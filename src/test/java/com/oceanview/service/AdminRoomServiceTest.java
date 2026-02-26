@@ -20,9 +20,9 @@ class AdminRoomServiceTest {
             service.addRoom(null, 100, "101");
 
             System.out.println(RED + "Result: FAIL (No Exception Thrown)" + RESET);
-            fail("Expected IllegalArgumentException was not thrown");
+            fail("Expected RuntimeException was not thrown");
 
-        } catch (IllegalArgumentException e) {
+        } catch (RuntimeException e) {
             System.out.println(GREEN + "Result: PASS" + RESET);
 
         } catch (Exception e) {

@@ -28,7 +28,6 @@ public class AdminRoomService {
             roomDAO.addRoom(room);
 
         } catch (Exception e) {
-            // 🔥 FIXED HERE
             throw new RuntimeException(e.getMessage());
         }
     }
