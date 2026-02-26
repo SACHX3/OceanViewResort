@@ -13,33 +13,41 @@ import java.util.List;
 @WebServlet("/api/roomTypes")
 public class RoomTypesApiServlet extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
     private final RoomDAO roomDAO = new RoomDAO();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse res)
+    protected void doGet(HttpServletRequest req,
+                         HttpServletResponse res)
             throws IOException {
 
         res.setContentType("application/json");
+        res.setCharacterEncoding("UTF-8");
 
         try {
+
             List<Room> types = roomDAO.findAllRoomTypes();
 
             StringBuilder json = new StringBuilder("[");
-            for (Room r : types) {
+
+            for (int i = 0; i < types.size(); i++) {
+
+                Room r = types.get(i);
+
                 json.append("{")
-                    .append("\"id\":").append(r.getRoomTypeId()).append(",")
-                    .append("\"name\":\"").append(r.getRoomType()).append("\",")
-                    .append("\"price\":").append(r.getRatePerNight())
-                    .append("},");
+                        .append("\"id\":").append(r.getRoomTypeId()).append(",")
+                        .append("\"name\":\"").append(r.getRoomType()).append("\"")
+                        .append("}");
+
+                if (i < types.size() - 1)
+                    json.append(",");
             }
-            if (json.length() > 1) json.setLength(json.length() - 1);
+
             json.append("]");
 
             res.getWriter().write(json.toString());
 
         } catch (Exception e) {
-            e.printStackTrace();
+
             res.getWriter().write("[]");
         }
     }

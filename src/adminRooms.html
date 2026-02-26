@@ -6,14 +6,9 @@
 
 <link rel="stylesheet" href="css/styles.css">
 
-<!-- FontAwesome -->
 <link rel="stylesheet"
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<style>
-
-
-</style>
 </head>
 
 <body class="dark-body">
@@ -47,7 +42,6 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 
 <h2><i class="fa-solid fa-bed"></i> Room Management</h2>
 
-<!-- ===== STATS ===== -->
 <div class="stats-row">
     <div class="stat-card">
         <i class="fa-solid fa-building"></i>
@@ -68,16 +62,9 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     </div>
 </div>
 
-<!-- ===== MESSAGES ===== -->
-<div class="message success" id="successBox" style="display:none;">
-    <i class="fa-solid fa-circle-check"></i> Success
-</div>
+<div class="message success" id="successBox" style="display:none;"></div>
+<div class="message error" id="errorBox" style="display:none;"></div>
 
-<div class="message error" id="errorBox" style="display:none;">
-    <i class="fa-solid fa-circle-xmark"></i> Error
-</div>
-
-<!-- ===== ADD ROOM ===== -->
 <div class="dashboard-card">
 <h3><i class="fa-solid fa-plus"></i> Add Room</h3>
 
@@ -126,36 +113,51 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 
 </main>
 
+<!-- EDIT MODAL -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <h3><i class="fa-solid fa-pen"></i> Edit Room</h3>
+
+        <input type="hidden" id="editRoomId">
+
+        <input type="text" id="editType" placeholder="Room Type">
+        <input type="number" id="editPrice" placeholder="Price">
+        <input type="text" id="editNumber" placeholder="Room Number">
+
+        <div class="modal-actions">
+            <button class="btn danger" onclick="closeModal()">Cancel</button>
+            <button class="btn" onclick="updateRoom()">Update</button>
+        </div>
+    </div>
+</div>
+
 <script>
+
 let roomData = [];
-let counterIntervals = {};
+
+const typeNameInput = document.getElementById("typeName");
+const priceInput = document.getElementById("price");
+const roomNumberInput = document.getElementById("roomNumber");
+
 function showSuccess(msg){
-    const successBox = document.getElementById("successBox");
-    const errorBox = document.getElementById("errorBox");
-
-    successBox.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${msg}`;
-    successBox.style.display = "block";
-    errorBox.style.display = "none";
-
-    setTimeout(() => successBox.style.display = "none", 3000);
+    const box = document.getElementById("successBox");
+    box.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${msg}`;
+    box.style.display = "block";
+    setTimeout(()=> box.style.display="none",3000);
 }
 
 function showError(msg){
-    const successBox = document.getElementById("successBox");
-    const errorBox = document.getElementById("errorBox");
-
-    errorBox.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> ${msg}`;
-    errorBox.style.display = "block";
-    successBox.style.display = "none";
-
-    setTimeout(() => errorBox.style.display = "none", 3000);
+    const box = document.getElementById("errorBox");
+    box.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> ${msg}`;
+    box.style.display = "block";
+    setTimeout(()=> box.style.display="none",3000);
 }
 
 function addRoom(){
 
-    const typeName = document.getElementById("typeName").value.trim();
-    const price = document.getElementById("price").value;
-    const roomNumber = document.getElementById("roomNumber").value.trim();
+    const typeName = typeNameInput.value.trim();
+    const price = priceInput.value.trim();
+    const roomNumber = roomNumberInput.value.trim();
 
     if(!typeName || !price || !roomNumber){
         showError("All fields are required");
@@ -165,24 +167,20 @@ function addRoom(){
     fetch("admin/rooms",{
         method:"POST",
         headers:{"Content-Type":"application/x-www-form-urlencoded"},
-        body:
-          "action=add" +
-          "&typeName=" + encodeURIComponent(typeName) +
-          "&price=" + price +
-          "&roomNumber=" + encodeURIComponent(roomNumber)
+        body:"action=add"
+            +"&typeName="+encodeURIComponent(typeName)
+            +"&price="+encodeURIComponent(price)
+            +"&roomNumber="+encodeURIComponent(roomNumber)
     })
     .then(r=>r.json())
     .then(res=>{
         if(res.success){
             showSuccess(res.message);
-            document.getElementById("typeName").value = "";
-            document.getElementById("price").value = "";
-            document.getElementById("roomNumber").value = "";
-
+            typeNameInput.value="";
+            priceInput.value="";
+            roomNumberInput.value="";
             loadRooms();
-        }else{
-            showError(res.message);
-        }
+        } else showError(res.message);
     });
 }
 
@@ -190,14 +188,14 @@ function loadRooms(){
     fetch("admin/rooms")
     .then(r=>r.json())
     .then(data=>{
-        roomData = data;
+        roomData=data;
         renderRooms(data);
         updateStats();
     });
 }
 
 function renderRooms(data){
-    const table = document.getElementById("roomTable");
+    const table=document.getElementById("roomTable");
     table.innerHTML="";
 
     data.forEach(r=>{
@@ -213,12 +211,60 @@ function renderRooms(data){
                 </span>
             </td>
             <td>
+                <button class="btn"
+                    onclick="openEditModal(${r.id}, '${r.type}', ${r.price}, '${r.number}')">
+                    <i class="fa-solid fa-pen"></i>
+                </button>
+
                 <button class="btn danger"
                     onclick="deleteRoom(${r.id})">
                     <i class="fa-solid fa-trash"></i>
                 </button>
             </td>
         </tr>`;
+    });
+}
+
+function openEditModal(id,type,price,number){
+    document.getElementById("editRoomId").value=id;
+    document.getElementById("editType").value=type;
+    document.getElementById("editPrice").value=price;
+    document.getElementById("editNumber").value=number;
+
+    document.getElementById("editModal").style.display="block";
+}
+
+function closeModal(){
+    document.getElementById("editModal").style.display="none";
+}
+
+function updateRoom(){
+    const id=document.getElementById("editRoomId").value;
+    const type=document.getElementById("editType").value.trim();
+    const price=document.getElementById("editPrice").value.trim();
+    const number=document.getElementById("editNumber").value.trim();
+
+    if(!type || !price || !number){
+        showError("All fields are required");
+        return;
+    }
+
+    fetch("admin/rooms",{
+        method:"POST",
+        headers:{"Content-Type":"application/x-www-form-urlencoded"},
+        body:"action=update"
+            +"&roomId="+id
+            +"&typeName="+encodeURIComponent(type)
+            +"&price="+encodeURIComponent(price)
+            +"&roomNumber="+encodeURIComponent(number)
+    })
+    .then(r=>r.json())
+    .then(res=>{
+        if(res.success){
+            showSuccess(res.message);
+            closeModal();
+            loadRooms();
+        } else showError(res.message);
     });
 }
 
@@ -235,68 +281,67 @@ function deleteRoom(id){
         if(res.success){
             showSuccess(res.message);
             loadRooms();
-        }else{
-            showError(res.message);
-        }
+        } else showError(res.message);
     });
 }
 
 function filterRooms(){
-    const term = document.getElementById("searchInput").value.toLowerCase();
-
-    const filtered = roomData.filter(r =>
-        r.number.toLowerCase().includes(term) ||
-        r.type.toLowerCase().includes(term)
-    );
-
-    renderRooms(filtered);
-}
-
-function animateCounter(id, endValue){
-
-    const element = document.getElementById(id);
-
-    if(counterIntervals[id]){
-        clearInterval(counterIntervals[id]);
-    }
-
-    let start = 0;
-    const duration = 500;
-    const step = Math.max(1, Math.floor(endValue / 20));
-
-    counterIntervals[id] = setInterval(() => {
-        start += step;
-
-        if(start >= endValue){
-            start = endValue;
-            clearInterval(counterIntervals[id]);
-        }
-
-        element.textContent = start;
-
-    }, 20);
+    const term=searchInput.value.toLowerCase();
+    renderRooms(roomData.filter(r=>
+        r.number.toLowerCase().includes(term)
+        || r.type.toLowerCase().includes(term)
+    ));
 }
 
 function updateStats(){
+    totalRooms.textContent=roomData.length;
+    availableCount.textContent=roomData.filter(r=>r.status==="AVAILABLE").length;
+    occupiedCount.textContent=roomData.filter(r=>r.status==="OCCUPIED").length;
+}
+
+window.onload=loadRooms;
+const totalRoomsEl = document.getElementById("totalRooms");
+const availableCountEl = document.getElementById("availableCount");
+const occupiedCountEl = document.getElementById("occupiedCount");
+
+function animateCount(element, target) {
+
+    let start = 0;
+    const duration = 800;
+    const frameRate = 20;
+    const totalFrames = duration / frameRate;
+    const increment = target / totalFrames;
+
+    const counter = setInterval(() => {
+        start += increment;
+
+        if (start >= target) {
+            element.textContent = target;
+            clearInterval(counter);
+        } else {
+            element.textContent = Math.floor(start);
+        }
+    }, frameRate);
+}
+
+const originalUpdateStats = updateStats;
+
+updateStats = function() {
 
     const total = roomData.length;
     const available = roomData.filter(r=>r.status==="AVAILABLE").length;
     const occupied = roomData.filter(r=>r.status==="OCCUPIED").length;
 
-    animateCounter("totalRooms", total);
-    animateCounter("availableCount", available);
-    animateCounter("occupiedCount", occupied);
-}
-
-window.onload = loadRooms;
-
+    animateCount(totalRoomsEl, total);
+    animateCount(availableCountEl, available);
+    animateCount(occupiedCountEl, occupied);
+};
 </script>
-
-</body>
 
 <footer class="dashboard-footer">
     <p><strong>Authorized Staff & Admin Only</strong></p>
     <p>© 2026 Ocean View Resort – Galle</p>
 </footer>
 
+</body>
 </html>
