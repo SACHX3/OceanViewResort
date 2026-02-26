@@ -127,9 +127,8 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 </main>
 
 <script>
-
 let roomData = [];
-
+let counterIntervals = {};
 function showSuccess(msg){
     const successBox = document.getElementById("successBox");
     const errorBox = document.getElementById("errorBox");
@@ -137,6 +136,8 @@ function showSuccess(msg){
     successBox.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${msg}`;
     successBox.style.display = "block";
     errorBox.style.display = "none";
+
+    setTimeout(() => successBox.style.display = "none", 3000);
 }
 
 function showError(msg){
@@ -146,6 +147,8 @@ function showError(msg){
     errorBox.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> ${msg}`;
     errorBox.style.display = "block";
     successBox.style.display = "none";
+
+    setTimeout(() => errorBox.style.display = "none", 3000);
 }
 
 function addRoom(){
@@ -164,7 +167,7 @@ function addRoom(){
         headers:{"Content-Type":"application/x-www-form-urlencoded"},
         body:
           "action=add" +
-          "&typeName=" + encodeURIComponent(typeName) + 
+          "&typeName=" + encodeURIComponent(typeName) +
           "&price=" + price +
           "&roomNumber=" + encodeURIComponent(roomNumber)
     })
@@ -172,6 +175,10 @@ function addRoom(){
     .then(res=>{
         if(res.success){
             showSuccess(res.message);
+            document.getElementById("typeName").value = "";
+            document.getElementById("price").value = "";
+            document.getElementById("roomNumber").value = "";
+
             loadRooms();
         }else{
             showError(res.message);
@@ -245,12 +252,40 @@ function filterRooms(){
     renderRooms(filtered);
 }
 
+function animateCounter(id, endValue){
+
+    const element = document.getElementById(id);
+
+    if(counterIntervals[id]){
+        clearInterval(counterIntervals[id]);
+    }
+
+    let start = 0;
+    const duration = 500;
+    const step = Math.max(1, Math.floor(endValue / 20));
+
+    counterIntervals[id] = setInterval(() => {
+        start += step;
+
+        if(start >= endValue){
+            start = endValue;
+            clearInterval(counterIntervals[id]);
+        }
+
+        element.textContent = start;
+
+    }, 20);
+}
+
 function updateStats(){
-    document.getElementById("totalRooms").textContent = roomData.length;
-    document.getElementById("availableCount").textContent =
-        roomData.filter(r=>r.status==="AVAILABLE").length;
-    document.getElementById("occupiedCount").textContent =
-        roomData.filter(r=>r.status==="OCCUPIED").length;
+
+    const total = roomData.length;
+    const available = roomData.filter(r=>r.status==="AVAILABLE").length;
+    const occupied = roomData.filter(r=>r.status==="OCCUPIED").length;
+
+    animateCounter("totalRooms", total);
+    animateCounter("availableCount", available);
+    animateCounter("occupiedCount", occupied);
 }
 
 window.onload = loadRooms;
