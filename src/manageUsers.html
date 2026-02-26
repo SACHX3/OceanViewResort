@@ -9,7 +9,6 @@
 <!-- FontAwesome -->
 <link rel="stylesheet"
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
 </head>
 
 <body class="dark-body">
@@ -69,11 +68,18 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 
 <!-- ===== STATUS MESSAGES ===== -->
 <div class="message success" id="successMsg" style="display:none;">
-    <i class="fa-solid fa-circle-check"></i> Success
+    <i class="fa-solid fa-circle-check"></i>
+    User added successfully!
 </div>
 
 <div class="message error" id="errorMsg" style="display:none;">
-    <i class="fa-solid fa-circle-xmark"></i> Error
+    <i class="fa-solid fa-circle-xmark"></i>
+    Failed to add user!
+</div>
+
+<div class="message error" id="duplicateMsg" style="display:none;">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    Username already exists!
 </div>
 
 <!-- ===== CREATE USER ===== -->
@@ -137,6 +143,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 
 <script>
 
+/* ===== Animate Counter ===== */
 function animateCounter(id, value){
     const el = document.getElementById(id);
     let start = 0;
@@ -153,6 +160,7 @@ function animateCounter(id, value){
     },20);
 }
 
+/* ===== Load Users ===== */
 function loadUsers(){
 
 fetch("api/users")
@@ -196,7 +204,6 @@ fetch("api/users")
         </tr>`;
     });
 
-    /* Animate Counters */
     animateCounter("totalUsers", data.length);
     animateCounter("adminCount", admins);
     animateCounter("staffCount", staff);
@@ -204,6 +211,7 @@ fetch("api/users")
 });
 }
 
+/* ===== Update User ===== */
 function updateUser(id){
 fetch("updateUser",{
 method:"POST",
@@ -215,6 +223,7 @@ body:
 }).then(()=>location.reload());
 }
 
+/* ===== Delete User ===== */
 function deleteUser(id){
 if(!confirm("Delete this user?")) return;
 
@@ -225,15 +234,44 @@ body:"userId="+id
 }).then(()=>location.reload());
 }
 
+/* ===== Show Status Message ===== */
+function showStatusMessage(){
+    const params = new URLSearchParams(window.location.search);
+    const success = params.get("success");
+    const error = params.get("error");
+
+    if(success === "true"){
+        document.getElementById("successMsg").style.display = "block";
+    }
+
+    if(error === "true"){
+        document.getElementById("errorMsg").style.display = "block";
+    }
+
+    if(error === "duplicate"){
+        document.getElementById("duplicateMsg").style.display = "block";
+    }
+
+    if(success || error){
+        setTimeout(()=>{
+            document.getElementById("successMsg").style.display="none";
+            document.getElementById("errorMsg").style.display="none";
+            document.getElementById("duplicateMsg").style.display="none";
+        },9000);
+        window.history.replaceState({}, document.title, "manageUsers.html");
+    }
+}
+
+/* ===== Initialize ===== */
 loadUsers();
+showStatusMessage();
 
 </script>
-
-</body>
 
 <footer class="dashboard-footer">
     <p><strong>Authorized Staff & Admin Only</strong></p>
     <p>© 2026 Ocean View Resort – Galle</p>
 </footer>
 
+</body>
 </html>

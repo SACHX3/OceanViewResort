@@ -131,64 +131,51 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 let roomData = [];
 
 function showSuccess(msg){
+    const successBox = document.getElementById("successBox");
+    const errorBox = document.getElementById("errorBox");
+
     successBox.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${msg}`;
     successBox.style.display = "block";
     errorBox.style.display = "none";
 }
 
 function showError(msg){
+    const successBox = document.getElementById("successBox");
+    const errorBox = document.getElementById("errorBox");
+
     errorBox.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> ${msg}`;
     errorBox.style.display = "block";
     successBox.style.display = "none";
 }
 
-function animateCounter(id, value){
-    const el = document.getElementById(id);
-    let start = 0;
-    const duration = 600;
-    const increment = value / (duration / 20);
+function addRoom(){
 
-    const counter = setInterval(()=>{
-        start += increment;
-        if(start >= value){
-            start = value;
-            clearInterval(counter);
+    const typeName = document.getElementById("typeName").value.trim();
+    const price = document.getElementById("price").value;
+    const roomNumber = document.getElementById("roomNumber").value.trim();
+
+    if(!typeName || !price || !roomNumber){
+        showError("All fields are required");
+        return;
+    }
+
+    fetch("admin/rooms",{
+        method:"POST",
+        headers:{"Content-Type":"application/x-www-form-urlencoded"},
+        body:
+          "action=add" +
+          "&typeName=" + encodeURIComponent(typeName) + 
+          "&price=" + price +
+          "&roomNumber=" + encodeURIComponent(roomNumber)
+    })
+    .then(r=>r.json())
+    .then(res=>{
+        if(res.success){
+            showSuccess(res.message);
+            loadRooms();
+        }else{
+            showError(res.message);
         }
-        el.textContent = Math.floor(start);
-    },20);
-}
-
-function updateStats(){
-    const total = roomData.length;
-    const available = roomData.filter(r=>r.status==="AVAILABLE").length;
-    const occupied = roomData.filter(r=>r.status==="OCCUPIED").length;
-
-    animateCounter("totalRooms", total);
-    animateCounter("availableCount", available);
-    animateCounter("occupiedCount", occupied);
-}
-
-function renderRooms(data){
-    roomTable.innerHTML="";
-    data.forEach(r=>{
-        roomTable.innerHTML+=`
-        <tr>
-            <td>${r.id}</td>
-            <td>${r.number}</td>
-            <td>${r.type}</td>
-            <td>LKR ${Number(r.price).toLocaleString()}</td>
-            <td>
-                <span class="badge ${r.status === 'AVAILABLE' ? 'success' : 'warning'}">
-                    ${r.status}
-                </span>
-            </td>
-            <td>
-                <button class="btn danger"
-                    onclick="deleteRoom(${r.id})">
-                    <i class="fa-solid fa-trash"></i>
-                </button>
-            </td>
-        </tr>`;
     });
 }
 
@@ -202,13 +189,30 @@ function loadRooms(){
     });
 }
 
-function filterRooms(){
-    const term = searchInput.value.toLowerCase();
-    const filtered = roomData.filter(r =>
-        r.number.toLowerCase().includes(term) ||
-        r.type.toLowerCase().includes(term)
-    );
-    renderRooms(filtered);
+function renderRooms(data){
+    const table = document.getElementById("roomTable");
+    table.innerHTML="";
+
+    data.forEach(r=>{
+        table.innerHTML+=`
+        <tr>
+            <td>${r.id}</td>
+            <td>${r.number}</td>
+            <td>${r.type}</td>
+            <td>LKR ${Number(r.price).toLocaleString()}</td>
+            <td>
+                <span class="badge ${r.status==='AVAILABLE'?'success':'warning'}">
+                    ${r.status}
+                </span>
+            </td>
+            <td>
+                <button class="btn danger"
+                    onclick="deleteRoom(${r.id})">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </td>
+        </tr>`;
+    });
 }
 
 function deleteRoom(id){
@@ -217,18 +221,39 @@ function deleteRoom(id){
     fetch("admin/rooms",{
         method:"POST",
         headers:{"Content-Type":"application/x-www-form-urlencoded"},
-        body:`action=delete&roomId=${id}`
+        body:"action=delete&roomId="+id
     })
     .then(r=>r.json())
     .then(res=>{
         if(res.success){
             showSuccess(res.message);
             loadRooms();
-        }else showError(res.message);
+        }else{
+            showError(res.message);
+        }
     });
 }
 
-loadRooms();
+function filterRooms(){
+    const term = document.getElementById("searchInput").value.toLowerCase();
+
+    const filtered = roomData.filter(r =>
+        r.number.toLowerCase().includes(term) ||
+        r.type.toLowerCase().includes(term)
+    );
+
+    renderRooms(filtered);
+}
+
+function updateStats(){
+    document.getElementById("totalRooms").textContent = roomData.length;
+    document.getElementById("availableCount").textContent =
+        roomData.filter(r=>r.status==="AVAILABLE").length;
+    document.getElementById("occupiedCount").textContent =
+        roomData.filter(r=>r.status==="OCCUPIED").length;
+}
+
+window.onload = loadRooms;
 
 </script>
 

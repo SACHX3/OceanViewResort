@@ -78,7 +78,7 @@ public class AdminRoomServlet extends HttpServlet {
             } else if ("delete".equals(action)) {
 
                 int roomId =
-                    Integer.parseInt(req.getParameter("roomI"));
+                    Integer.parseInt(req.getParameter("roomId"));
 
                 service.deleteRoom(roomId);
 
