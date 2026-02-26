@@ -45,7 +45,7 @@ public class ReservationDAO {
             throws SQLException {
 
         String sql =
-            "SELECT r.*, rm.room_number, rt.type_name, rt.rate_per_night " +
+            "SELECT r.*, rm.room_number, rm.rate_per_night, rt.type_name " +
             "FROM reservations r " +
             "JOIN rooms rm ON r.room_id = rm.room_id " +
             "JOIN room_types rt ON rm.room_type_id = rt.room_type_id " +
@@ -74,7 +74,7 @@ public class ReservationDAO {
         List<Reservation> list = new ArrayList<>();
 
         String sql =
-            "SELECT r.*, rm.room_number, rt.type_name, rt.rate_per_night " +
+            "SELECT r.*, rm.room_number, rm.rate_per_night, rt.type_name " +
             "FROM reservations r " +
             "JOIN rooms rm ON r.room_id = rm.room_id " +
             "JOIN room_types rt ON rm.room_type_id = rt.room_type_id " +
@@ -91,7 +91,7 @@ public class ReservationDAO {
         return list;
     }
 
-    /* ================= CHECK OUT (FINAL FIX) ================= */
+    /* ================= CHECK OUT ================= */
 
     public void checkOut(String reservationNumber) throws SQLException {
 
