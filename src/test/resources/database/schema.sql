@@ -5,78 +5,75 @@ DROP TABLE IF EXISTS rooms;
 DROP TABLE IF EXISTS room_types;
 DROP TABLE IF EXISTS users;
 
--- Table for room categories and prices
+-- ================= ROOM TYPES =================
 CREATE TABLE room_types (
-  room_type_id INT AUTO_INCREMENT PRIMARY KEY,  -- Unique room type ID
-  type_name VARCHAR(50) NOT NULL UNIQUE,        -- Room type name
-  rate_per_night DECIMAL(10,2) NOT NULL CHECK (rate_per_night > 0) -- Price per night
+  room_type_id INT AUTO_INCREMENT PRIMARY KEY,
+  type_name VARCHAR(50) NOT NULL UNIQUE
 );
 
--- Table for hotel rooms
+-- ================= ROOMS =================
 CREATE TABLE rooms (
-  room_id INT AUTO_INCREMENT PRIMARY KEY,      -- Unique room ID
-  room_number VARCHAR(10) NOT NULL UNIQUE,     -- Room number
-  room_type_id INT NOT NULL,                   -- Related room type
-  status ENUM('AVAILABLE','OCCUPIED') DEFAULT 'AVAILABLE', -- Room status
+  room_id INT AUTO_INCREMENT PRIMARY KEY,
+  room_number VARCHAR(10) NOT NULL UNIQUE,
+  room_type_id INT NOT NULL,
+  rate_per_night DECIMAL(10,2) NOT NULL, -- ✅ REQUIRED FOR YOUR DAO
+  status ENUM('AVAILABLE','OCCUPIED') DEFAULT 'AVAILABLE',
   FOREIGN KEY (room_type_id) REFERENCES room_types(room_type_id)
 );
 
--- Table for guest reservations
+-- ================= RESERVATIONS =================
 CREATE TABLE reservations (
-  reservation_id INT AUTO_INCREMENT PRIMARY KEY, -- Unique reservation ID
-  reservation_number VARCHAR(20) NOT NULL UNIQUE, -- Reservation reference
-  guest_name VARCHAR(100) NOT NULL,               -- Guest name
-  address VARCHAR(255) NOT NULL,                  -- Guest address
-  contact_number VARCHAR(15) NOT NULL,            -- Phone number
-  contact_email VARCHAR(100) NOT NULL,            -- Email
-  room_id INT NOT NULL,                           -- Assigned room
-  check_in DATE NOT NULL,                         -- Check-in date
-  check_out DATE NOT NULL,                        -- Check-out date
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Created time
-  status VARCHAR(20) DEFAULT 'CHECKED_IN',        -- Reservation status
-  checked_out_at DATE NULL,                       -- Checkout date
+  reservation_id INT AUTO_INCREMENT PRIMARY KEY,
+  reservation_number VARCHAR(20) NOT NULL UNIQUE,
+  guest_name VARCHAR(100) NOT NULL,
+  address VARCHAR(255) NOT NULL,
+  contact_number VARCHAR(15) NOT NULL,
+  contact_email VARCHAR(100) NOT NULL,
+  room_id INT NOT NULL,
+  check_in DATE NOT NULL,
+  check_out DATE NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  status VARCHAR(20) DEFAULT 'CHECKED_IN',
+  checked_out_at DATE NULL,
   FOREIGN KEY (room_id) REFERENCES rooms(room_id)
 );
 
--- Table for billing information
+-- ================= BILLING =================
 CREATE TABLE billing (
-  bill_id INT AUTO_INCREMENT PRIMARY KEY, -- Unique bill ID
-  reservation_number VARCHAR(50) NOT NULL, -- Reservation reference
-  nights INT NOT NULL,                     -- Number of nights
-  price_per_night DECIMAL(10,2) NOT NULL,  -- Nightly rate
-  total_amount DECIMAL(12,2) NOT NULL,     -- Total bill
-  generated_at DATETIME NOT NULL           -- Bill generated time
+  bill_id INT AUTO_INCREMENT PRIMARY KEY,
+  reservation_number VARCHAR(50) NOT NULL,
+  nights INT NOT NULL,
+  price_per_night DECIMAL(10,2) NOT NULL,
+  total_amount DECIMAL(12,2) NOT NULL,
+  generated_at DATETIME NOT NULL
 );
 
--- Table for system users
+-- ================= USERS =================
 CREATE TABLE users (
-  user_id INT AUTO_INCREMENT PRIMARY KEY, -- Unique user ID
-  username VARCHAR(50) NOT NULL UNIQUE,   -- Login username
-  password_hash VARCHAR(255) NOT NULL,    -- Encrypted password
-  full_name VARCHAR(100) NOT NULL,        -- User full name
-  role ENUM('ADMIN','STAFF') DEFAULT 'STAFF', -- User role
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Account creation time
+  user_id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(50) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  full_name VARCHAR(100) NOT NULL,
+  role ENUM('ADMIN','STAFF') DEFAULT 'STAFF',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Insert room types
-INSERT INTO room_types (type_name, rate_per_night) VALUES
-('Standard', 5000.00),
-('Suite', 7000.00),
-('Luxury', 12000.00);
+-- ================= SEED DATA =================
 
--- Insert rooms
-INSERT INTO rooms (room_number, room_type_id, status) VALUES
-('101', 1, 'AVAILABLE'),
-('102', 2, 'AVAILABLE'),
-('103', 3, 'AVAILABLE');
+INSERT INTO room_types (type_name) VALUES
+('Standard'),
+('Suite'),
+('Luxury');
 
--- Insert system users
--- admin password = "12345" (SHA-256)
+INSERT INTO rooms (room_number, room_type_id, rate_per_night, status) VALUES
+('101', 1, 5000.00, 'AVAILABLE'),
+('102', 2, 7000.00, 'AVAILABLE'),
+('103', 3, 12000.00, 'AVAILABLE');
+
 INSERT INTO users (username, password_hash, full_name, role) VALUES
 ('admin', '5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5', 'System Administrator', 'ADMIN'),
 ('staff1', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'Staff Member', 'STAFF');
 
--- Insert test reservation
 INSERT INTO reservations (
   reservation_number,
   guest_name,
@@ -99,7 +96,6 @@ INSERT INTO reservations (
   'CHECKED_OUT'
 );
 
--- Insert billing record for testing revenue
 INSERT INTO billing (
   reservation_number,
   nights,
