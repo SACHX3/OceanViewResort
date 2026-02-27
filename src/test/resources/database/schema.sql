@@ -16,7 +16,7 @@ CREATE TABLE rooms (
   room_id INT AUTO_INCREMENT PRIMARY KEY,
   room_number VARCHAR(10) NOT NULL UNIQUE,
   room_type_id INT NOT NULL,
-  rate_per_night DECIMAL(10,2) NOT NULL, -- ✅ REQUIRED FOR YOUR DAO
+  rate_per_night DECIMAL(10,2) NOT NULL,
   status ENUM('AVAILABLE','OCCUPIED') DEFAULT 'AVAILABLE',
   FOREIGN KEY (room_type_id) REFERENCES room_types(room_type_id)
 );

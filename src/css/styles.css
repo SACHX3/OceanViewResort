@@ -10,7 +10,6 @@ input[type="password"], input[type="text"], select {
 	border-radius: 5px;
 	border: 1px solid #ccc;
 	font-size: 14px;
-	margin: 8px 0 15px 0;
 	padding: 10px;
 	width: 98%;
 }
@@ -18,7 +17,6 @@ input[type="password"], input[type="text"], select {
 .badge {
 	border-radius: 12px;
 	font-size: 12px;
-	font-weight: 600;
 	padding: 4px 10px;
 }
 
@@ -47,7 +45,7 @@ input[type="password"], input[type="text"], select {
 	color: #fff;
 	cursor: pointer;
 	font-size: 14px;
-	padding: 8px 14px;
+	padding: 10px 14px;
 	transition: 0.3s;
 }
 
@@ -65,13 +63,10 @@ input[type="password"], input[type="text"], select {
 }
 
 .btn.danger {
-	background-color: #c0392b;
 	background: #ff6b6b;
 }
 
 .btn.danger:hover {
-	background-color: #922b21;
-	background-color: #a93226;
 	background: #e14c4c;
 }
 
@@ -187,19 +182,18 @@ input[type="password"], input[type="text"], select {
 
 .data-table td, .data-table th {
 	border: 1px solid #1a1616;
-	padding: 10px;
 	padding: 12px;
 	text-align: center;
 }
 
 .data-table th {
-	background: #1e1e2f;
+	background: #111827;
 	color: #fff;
 	font-weight: 600;
 }
 
 .data-table tr:hover {
-	background: #2a2a40;
+	background: #374151;
 }
 
 .details p {
@@ -233,9 +227,7 @@ input[type="password"], input[type="text"], select {
 
 .form-grid {
 	display: grid;
-	gap: 18px;
 	gap: 20px;
-	grid-template-columns: 1fr 1fr;
 	grid-template-columns: 600px;
 	margin: auto;
 	padding: auto;
@@ -267,23 +259,8 @@ input[type="password"], input[type="text"], select {
 }
 
 .form-group {
-	margin-bottom: 15px;
 	margin-bottom: 18px;
 	position: relative;
-}
-
-.form-group input {
-	background: #1e1e2f;
-	border-radius: 6px;
-	border-radius: 8px;
-	border: 1px solid #2c2c3a;
-	border: 1px solid #444;
-	color: #fff;
-	font-size: 14px;
-	padding: 10px;
-	padding: 11px 42px 11px 12px;
-	width: 100%;
-	width: 85%;
 }
 
 .form-group input, .form-group select {
@@ -292,7 +269,7 @@ input[type="password"], input[type="text"], select {
 	border: 1px solid #1a1616;
 	color:#111;
 	padding: 10px;
-	width: 94%;
+	width: 98%;
 }
 
 .form-group input:focus {
@@ -329,6 +306,10 @@ input[type="password"], input[type="text"], select {
 
 .green {
 	background: linear-gradient(45deg,#34d399,#10b981);
+}
+
+.purple {
+	background: linear-gradient(45deg, #873ff9, #c35cff);
 }
 
 .modal {
@@ -465,26 +446,20 @@ input[type="password"], input[type="text"], select {
 }
 
 .message {
-	border-radius: 4px;
 	border-radius: 6px;
 	font-weight: bold;
 	margin-bottom: 15px;
-	margin-top: 10px;
 	margin-top: 20px;
 	padding: 12px;
 }
 
 .message.error {
-	background: #3f1e1e;
 	background: #fdecea;
-	color: #c0392b;
 	color: #ff6b6b;
 }
 
 .message.success {
-	background: #1e3f2e;
 	background: #e8f6f3;
-	color: #117a65;
 	color: #34d399;
 }
 
@@ -493,9 +468,7 @@ input[type="password"], input[type="text"], select {
 }
 
 .page-desc {
-	color: #555;
 	color: #aaa;
-	margin-bottom: 15px;
 	margin-bottom: 20px;
 }
 
@@ -513,10 +486,6 @@ input[type="password"], input[type="text"], select {
 	overflow: hidden;
 	position: fixed;
 	z-index: -1;
-}
-
-.purple {
-	background: linear-gradient(45deg,#ff6b6b,#e63946);
 }
 
 .red {
@@ -538,7 +507,7 @@ input[type="password"], input[type="text"], select {
 
 .search-box {
 	align-items: center;
-	display: flex;
+	display: block
 	gap: 10px;
 	margin-bottom: 15px;
 }
@@ -549,8 +518,8 @@ input[type="password"], input[type="text"], select {
 	border: 1px solid #1a1616;
 	color:#111;
 	flex: 1;
-	padding: 8px;
-	width: 300px;
+	padding: 10px;
+	width: 99%;
 }
 
 .search-card input {
@@ -559,7 +528,6 @@ input[type="password"], input[type="text"], select {
 	border: 1px solid #1a1616;
 	color:#111;
 	padding: 10px;
-	width: 99%;
 }
 
 .section-title {
@@ -615,10 +583,8 @@ input[type="password"], input[type="text"], select {
 
 .stat-card {
 	background: linear-gradient(45deg,#34d399,#10b981);
-	border-radius: 10px;
 	border-radius: 12px;
 	box-shadow: 0 6px 15px rgba(0,0,0,0.08);
-	padding: 20px;
 	padding: 25px;
 	text-align: center;
 	transition: 0.3s ease;
@@ -643,7 +609,6 @@ input[type="password"], input[type="text"], select {
 
 .stat-card p {
 	color:#fff;
-	font-size: 14px;
 	font-size: 28px;
 	font-weight: bold;
 	opacity: 0.8;
@@ -660,8 +625,7 @@ input[type="password"], input[type="text"], select {
 }
 
 .stat-grid .fa-solid {
-	font-size: 34px;
-	font-size: 36px;
+	font-size: 38px;
 }
 
 .stats-row {
@@ -686,19 +650,16 @@ input[type="password"], input[type="text"], select {
 
 .status-occupied {
 	background: #3f2a1e;
-	color: #ff6b6b;
 	color: red;
 	font-weight: bold;
 }
 
 .status-select {
-	background: #1e1e2f;
-	border-radius: 4px;
+	background: #181e29;
 	border-radius: 6px;
 	border: 1px solid #1a1616;
 	color: #fff;
-	padding: 6px;
-	padding: 6px 10px;
+	padding:10px;
 }
 
 .status-success {
@@ -730,7 +691,7 @@ input[type="password"], input[type="text"], select {
 
 .top-header {
 	align-items: center;
-	background: #e63946;
+	background: linear-gradient(45deg, #2258f3, #cb39e6);
 	display: flex;
 	height: 90px;
 	justify-content: space-between;
@@ -742,56 +703,17 @@ input[type="password"], input[type="text"], select {
 	z-index: 1000;
 }
 
-.gauge-container{
-    width:220px;
-    margin:auto;
-    position:relative;
-}
-.gauge-text{
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    font-size:24px;
-    font-weight:bold;
-}
-.stat-grid .fa-solid{
-    font-size:38px;
-}
-.sparkline-wrap{
-    margin-top:15px;
-}
-
 @keyframes float {
-	from {
-		transform: translateY(100vh) scale(0.5);
-	}
-
-	to {
-		transform: translateY(-10vh) scale(1.2);
-	}
+	from { transform: translateY(100vh) scale(0.5); }
+	to { transform: translateY(-10vh) scale(1.2); }
 }
 
 @keyframes fadeUp {
-	from {
-		opacity: 0;
-		transform: translateY(30px);
-	}
-
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
+	from { opacity: 0; transform: translateY(30px); }
+	to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fadeDown {
-	from {
-		opacity: 0;
-		transform: translateY(-30px);
-	}
-
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
+	from { opacity: 0; transform: translateY(-30px); }
+	to { opacity: 1; transform: translateY(0); }
 }
