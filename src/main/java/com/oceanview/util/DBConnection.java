@@ -41,11 +41,10 @@ public class DBConnection {
         String db   = System.getenv().getOrDefault("DB_NAME", "ocean_view_reservation");
         String user = System.getenv().getOrDefault("DB_USER", "root");
         String pass = System.getenv().getOrDefault("DB_PASS", "");
-
         String url = "jdbc:mysql://" + host + ":" + port + "/" + db
                 + "?useSSL=false"
                 + "&allowPublicKeyRetrieval=true"
-                + "&serverTimezone=UTC";
+                + "&serverTimezone=Asia/Colombo";
 
         return DriverManager.getConnection(url, user, pass);
     }
