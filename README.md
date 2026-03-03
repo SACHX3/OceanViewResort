@@ -12,23 +12,30 @@
 
 ## 📑 Table of Contents
 
-- [Overview](#-overview)
-- [System Features](#-system-features)
-- [Technology Stack](#-technology-stack)
-- [Architecture](#-architecture)
-- [Installation & Build](#-installation--build)
-- [Automated Testing](#-automated-testing)
-- [Code Coverage (JaCoCo)](#-code-coverage-jacoco)
-- [Continuous Integration](#-continuous-integration)
-- [Project Structure](#-project-structure)
-- [Release History](#-release-history)
-- [Security & Validation](#-security--validation)
-- [Academic Objectives Achieved](#-academic-objectives-achieved)
-- [License](#-license)
+- [Overview](#overview)
+- [System Features](#system-features)
+- [Technology Stack](#technology-stack)
+- [Architecture](#architecture)
+- [Installation & Build](#installation--build)
+- [Database Table Structures](#database-table-structures)
+- [How to Run This Project](#how-to-run-this-project)
+- [Automated Testing](#automated-testing)
+- [Code Coverage (JaCoCo)](#code-coverage-jacoco)
+- [Continuous Integration](#continuous-integration)
+- [Project Structure](#project-structure)
+- [Security & Validation](#security--validation)
+- [Academic Objectives Achieved](#academic-objectives-achieved)
+- [License](#license)
 
 ---
 
+<a id="overview"></a>
 ## 📖 Overview
+
+<p align="center">
+  <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj3T5-inXSDbzYwopqMkJEkYBbhU1zpkIuxwY1fBZMSDsmr8Si3SaFnv776a_hrYoeuV7Z14aMArwUL1S0NhNYyMc22j1pTU7slS9dO-mP4sVADnLBl1vfj-bdl4VXGaYbncpMQnnkikJySYsU4OBnWE1U4I9a8o2WDJivXtZetWbEip_NmVXXv0Pn0_6E/s1600/Screenshot%202026-03-03%20140707.png" alt="Ocean View Resort ERD" width="600"/>
+</p>
+
 
 The **Ocean View Resort Reservation Management System** is a multi-layered Java web application developed using modern software engineering principles.
 
@@ -51,6 +58,7 @@ The project emphasizes:
 
 ---
 
+<a id="system-features"></a>
 ## 🚀 System Features
 
 | Module | Features Implemented | Status |
@@ -69,13 +77,19 @@ The project emphasizes:
 
 ---
 
+<a id="technology-stack"></a>
 ## 🛠 Technology Stack
 
 ### 🔹 Backend
 - Java 17
 - Jakarta Servlet API
-- JSP
 - JDBC
+- MySQL
+
+### 🔹 Frontend
+- HTML5
+- CSS3
+- JavaScript
 
 ### 🔹 Build Tool
 - Maven
@@ -97,6 +111,7 @@ The project emphasizes:
 
 ---
 
+<a id="architecture"></a>
 ## 🏗 Architecture
 
 The system follows a **Layered Architecture** design:
@@ -145,13 +160,14 @@ MySQL Database
 
 ---
 
+<a id="installation--build"></a>
 ## ⚙️ Installation & Build
 
 ### 1️⃣ Clone Repository
 
 ```bash
-git clone https://github.com/SACHX3/OceanViewReservationSystem.git
-cd OceanViewReservationSystem
+git clone https://github.com/SACHX3/OceanViewResort.git
+cd OceanViewResort
 ```
 
 ### 2️⃣ Build Project
@@ -170,6 +186,117 @@ Deploy the WAR file to a servlet container such as **Apache Tomcat**.
 
 ---
 
+<a id="how-to-run-this-project"></a>
+## ▶️ How to Run This Project
+
+<a id="database-table-structures"></a>
+### 🗄 Database Table
+
+Below are the main tables:
+
+```
+users
+room_types
+rooms
+reservations
+billing
+```
+Relationships:
+
+```
+room_types → rooms → reservations → billing  
+users → reservations  
+```
+All tables use PK & FK constraints for referential integrity.
+
+### 1️⃣ Database Setup
+
+Create MySQL database:
+
+```
+ocean_view_reservation
+```
+
+Using MySQL CLI:
+
+```bash
+mysql -u root -p
+```
+
+```sql
+CREATE DATABASE ocean_view_reservation;
+EXIT;
+```
+
+Import SQL file:
+
+```bash
+mysql -u root -p ocean_view_reservation < ocean_view_reservation.sql
+```
+
+Ensure your `DBConnection.java` uses:
+
+```
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=ocean_view_reservation
+DB_USER=root
+DB_PASS=
+```
+
+Time zone configured as:
+
+```
+serverTimezone=Asia/Colombo
+```
+
+---
+
+### 2️⃣ Apache Tomcat Setup
+
+Download **Apache Tomcat 9+**:
+
+https://tomcat.apache.org/download-90.cgi
+
+Build project:
+
+```bash
+mvn clean install
+```
+
+WAR file generated:
+
+```
+target/*.war
+```
+
+Copy WAR file into:
+
+```
+apache-tomcat/webapps/
+```
+
+Start Tomcat:
+
+Windows:
+```
+startup.bat
+```
+
+Linux/macOS:
+```
+./startup.sh
+```
+
+Access application:
+
+```
+http://localhost:8080/OceanViewResort/
+```
+
+---
+
+<a id="automated-testing"></a>
 ## 🧪 Automated Testing
 
 This project follows **Test-Driven Development (TDD)**:
@@ -177,14 +304,6 @@ This project follows **Test-Driven Development (TDD)**:
 - 🔴 Red – Write failing test  
 - 🟢 Green – Implement minimal code  
 - 🔵 Refactor – Improve code quality  
-
-### Testing Coverage
-
-- 26 structured unit tests  
-- Service layer validation tests  
-- DAO interaction tests  
-- Revenue calculation verification  
-- Reservation logic validation  
 
 ### Run Tests
 
@@ -196,6 +315,7 @@ Build will fail automatically if any test fails.
 
 ---
 
+<a id="code-coverage-jacoco"></a>
 ## 📊 Code Coverage (JaCoCo)
 
 Generate coverage report:
@@ -210,14 +330,9 @@ Open:
 target/site/jacoco/index.html
 ```
 
-Coverage includes:
-
-- Business logic branches  
-- Validation paths  
-- DAO operations  
-
 ---
 
+<a id="continuous-integration"></a>
 ## 🔁 Continuous Integration
 
 The project integrates **GitHub Actions** for automated CI validation.
@@ -228,23 +343,9 @@ Workflow file:
 .github/workflows/ci.yml
 ```
 
-### Pipeline Actions
-
-- Checkout repository  
-- Setup Java 17  
-- Run `mvn clean install`  
-- Execute all unit tests  
-- Fail build on test failure  
-- Generate build artifact  
-
-### CI Guarantees
-
-- Every push is validated  
-- No unstable code enters main branch  
-- Continuous quality assurance  
-
 ---
 
+<a id="project-structure"></a>
 ## 🗂 Project Structure
 
 ```
@@ -270,72 +371,11 @@ OceanViewReservationSystem
 
 ---
 
-## 📦 Release History
-
-### 🚀 v1.0 — Core Reservation System
-- Reservation booking functionality
-- Email notifications
-- Admin & staff authentication
-- Dashboard creation
-
-### 🔍 v1.1 — Reservation Management Enhancements
-- Reservation list view
-- Delete reservation functionality
-- Search by reservation number
-
-### 🛠 v1.2 — Role Management Fix
-- Corrected role update logic
-- Ensured database persistence
-- Improved validation checks
-
-### 🏨 v1.3 — Room Availability Management
-- Check available rooms feature
-- Automatic & manual availability updates
-
-### 🏢 v1.4 — Room Management Module
-- Room data maintenance
-- Admin dashboard room control
-
-### 💳 v1.5 — Billing & Reporting
-- Guest checkout system
-- Bill search & print
-- Manual checkout option
-- Reservation detail table view
-
-### 📊 v1.6 — Dashboard & Revenue Tracking
-- Daily reservation count
-- Check-in/check-out monitoring
-- Occupied room tracking
-- Daily revenue calculation (LKR)
-- Monthly revenue calculation (LKR)
-
-### 🎨 v1.7 — UI Redesign & Visualization
-- Modern interface theme
-- Donut chart for occupancy
-- 7-day revenue trend analysis
-- Animated statistic counters
-
-### 🧪 v1.8 — Full Test Automation & CI/CD
-- 26 automated test cases
-- PASS/FAIL validation demonstration
-- CI pipeline integration
-- Automated build & test execution
-
-### 📘 v1.9 — Coverage Reporting & Documentation Enhancement
-
-- Integrated JaCoCo test coverage reporting
-- Configured Maven coverage report generation
-- Added structured and comprehensive README
-- Improved formatting, setup instructions, and project structure documentation
-
----
-
+<a id="security--validation"></a>
 ## 🔐 Security & Validation
 
-The system enforces:
-
 - Role-based authentication  
-- Input validation on all endpoints  
+- Input validation  
 - Reservation date validation  
 - Duplicate revenue prevention  
 - Structured exception handling  
@@ -344,6 +384,7 @@ All financial calculations are unit-tested to prevent inconsistencies.
 
 ---
 
+<a id="academic-objectives-achieved"></a>
 ## 🎯 Academic Objectives Achieved
 
 - ✔ Test-Driven Development (TDD)  
@@ -357,6 +398,16 @@ All financial calculations are unit-tested to prevent inconsistencies.
 
 ---
 
+## 👩‍💻 Author
+
+**Sameera Chathuranga**  
+BSc (Hons) Software Engineering  
+ICBT Campus
+
+---
+
+<a id="license"></a>
 ## 📄 License
 
 Academic project — intended for educational and evaluation purposes.
+
