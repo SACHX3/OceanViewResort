@@ -321,6 +321,13 @@ OceanViewReservationSystem
 - CI pipeline integration
 - Automated build & test execution
 
+### 📘 v1.9 — Coverage Reporting & Documentation Enhancement
+
+- Integrated JaCoCo test coverage reporting
+- Configured Maven coverage report generation
+- Added structured and comprehensive README
+- Improved formatting, setup instructions, and project structure documentation
+
 ---
 
 ## 🔐 Security & Validation

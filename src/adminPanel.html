@@ -4,25 +4,15 @@
 <meta charset="UTF-8">
 <title>Admin Dashboard | Ocean View Resort</title>
 
-<link rel="stylesheet" href="css/styles.css">
-
-<!-- FontAwesome -->
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-<!-- ChartJS -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<style>
-
-</style>
+<link rel="stylesheet" href="webapp/css/styles.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="webapp/js/chart.js"></script>
 
 </head>
 
 <body class="dark-body">
 
-<!-- ===== HEADER ===== -->
-<header class="top-header">
+<header class="top-header-admin">
     <div class="logo">
         <i class="fa-solid fa-hotel"></i> Ocean View Resort
     </div>
@@ -31,7 +21,6 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     </a>
 </header>
 
-<!-- ===== SIDEBAR ===== -->
 <aside class="sidebar-fixed">
     <h3><i class="fa-solid fa-user-shield"></i> Admin Panel</h3>
 
@@ -50,16 +39,14 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 
 <main class="dashboard-main">
 
-<!-- ===== STAT CARDS ===== -->
 <div class="stat-grid">
-
-    <div class="stat-box blue">
+    <div class="stat-box purple">
         <i class="fa-solid fa-calendar-check"></i>
         <h2 id="dailyReservations">0</h2>
         <p>New Booking</p>
     </div>
 
-    <div class="stat-box green">
+    <div class="stat-box orange">
         <i class="fa-solid fa-bed"></i>
         <h2 id="occupiedRooms">0</h2>
         <p>Occupied Rooms</p>
@@ -71,7 +58,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
         <p>Available Rooms</p>
     </div>
 
-    <div class="stat-box orange">
+    <div class="stat-box green">
         <i class="fa-solid fa-arrow-right-to-bracket"></i>
         <h2 id="checkInToday">0</h2>
         <p>Check In</p>
@@ -82,10 +69,8 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
         <h2 id="checkOutToday">0</h2>
         <p>Check Out</p>
     </div>
-
 </div>
 
-<!-- ===== CHART ROW ===== -->
 <div class="dashboard-row">
 
     <div class="dashboard-card large">
@@ -93,37 +78,57 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
         <canvas id="revenueChart"></canvas>
     </div>
 
+    <div class="dashboard-card large">
+        <h3><i class="fa-solid fa-chart-column"></i> Booking Activity</h3>
+        <canvas id="bookingBarChart"></canvas>
+    </div>
+
+    <div class="dashboard-card small">
+        <h3><i class="fa-solid fa-gauge-high"></i> Room Occupancy</h3>
+        <div style="margin-top:70px;">
+            <div class="gauge-container">
+                <canvas id="occupancyGauge"></canvas>
+                <div class="gauge-text" id="occupancyPercent">0%</div>
+            </div>
+            <div class="sparkline-wrap">
+                <canvas id="occupancySparkline" height="60"></canvas>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="dashboard-row">
+
     <div class="dashboard-card small">
         <h3><i class="fa-solid fa-chart-pie"></i> Check In vs Check Out</h3>
         <canvas id="donutChart"></canvas>
     </div>
 
-</div>
-
-<!-- ===== BOTTOM ROW ===== -->
-<div class="dashboard-row">
-
-    <!-- Occupancy Gauge -->
     <div class="dashboard-card small">
-        <h3><i class="fa-solid fa-gauge-high"></i> Room Occupancy</h3>
-        <div class="gauge-container">
-            <canvas id="occupancyGauge"></canvas>
-            <div class="gauge-text" id="occupancyPercent">0%</div>
-        </div>
+        <h3><i class="fa-solid fa-chart-simple"></i> Revenue Distribution</h3>
+        <canvas id="revenuePieChart"></canvas>
     </div>
 
-    <!-- Revenue Summary -->
-    <div class="dashboard-card small">
+    <div class="dashboard-card large revenue-card">
         <h3><i class="fa-solid fa-coins"></i> Revenue Summary</h3>
 
-        <div class="revenue-box">
-            <h4>Daily Revenue</h4>
-            <p id="dailyRevenue">0</p>
+        <div class="revenue-kpi revenue-box">
+            <span class="label">Today</span>
+            <h2 id="dailyRevenue">LKR 0</h2>
         </div>
 
-        <div class="revenue-box">
-            <h4>Monthly Revenue</h4>
-            <p id="monthlyRevenue">0</p>
+        <div class="revenue-kpi revenue-box">
+            <span class="label">This Month</span>
+            <h2 id="monthlyRevenue">LKR 0</h2>
+        </div>
+
+        <div class="revenue-progress">
+            <div class="progress-bar" id="revenueProgressBar"></div>
+        </div>
+
+        <div class="progress-text">
+            <span id="revenuePercent">0%</span> of monthly revenue achieved
         </div>
     </div>
 
@@ -132,20 +137,20 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 </main>
 
 <script>
-let revenueChart=null,
-    donutChart=null,
-    occupancyGauge=null,
-    occupancySpark=null;
-
-const lastValues={};
+let revenueChart, donutChart, occupancyGauge, occupancySpark, bookingBarChart, revenuePieChart;
+const lastValues = {};
 
 function animateCounter(id,newValue,duration=800){
     const el=document.getElementById(id);
     if(!el) return;
 
     newValue=Number(newValue||0);
-    const oldValue=lastValues[id]??0;
-    if(oldValue===newValue) return;
+    const oldValue=lastValues[id] ?? 0;
+
+    if(oldValue===newValue){
+        el.textContent=newValue.toLocaleString();
+        return;
+    }
 
     lastValues[id]=newValue;
 
@@ -157,122 +162,178 @@ function animateCounter(id,newValue,duration=800){
         el.textContent=value.toLocaleString();
         if(progress<1) requestAnimationFrame(update);
     }
+
     requestAnimationFrame(update);
 }
 
 function loadDashboard(){
-
 fetch("api/reports")
 .then(r=>r.json())
 .then(data=>{
 
-    animateCounter("dailyReservations",data.dailyReservations);
-    animateCounter("occupiedRooms",data.occupiedRooms);
-    animateCounter("availableRooms",data.availableRooms);
-    animateCounter("checkInToday",data.checkInToday);
-    animateCounter("checkOutToday",data.checkOutToday);
+animateCounter("dailyReservations",data.dailyReservations);
+animateCounter("occupiedRooms",data.occupiedRooms);
+animateCounter("availableRooms",data.availableRooms);
+animateCounter("checkInToday",data.checkInToday);
+animateCounter("checkOutToday",data.checkOutToday);
 
-    document.getElementById("dailyRevenue").textContent=
-        "LKR "+Number(data.dailyRevenue||0).toLocaleString();
+const daily=data.dailyRevenue||0;
+const monthly=data.monthlyRevenue||0;
+const remaining=Math.max(monthly-daily,0);
+const noRevenueData = monthly === 0;
 
-    document.getElementById("monthlyRevenue").textContent=
-        "LKR "+Number(data.monthlyRevenue||0).toLocaleString();
+document.getElementById("dailyRevenue").textContent =
+"LKR " + daily.toLocaleString();
 
-    if(revenueChart) revenueChart.destroy();
-    revenueChart=new Chart(document.getElementById("revenueChart"),{
-        type:'line',
-        data:{
-            labels:data.revenueLabels||[],
-            datasets:[{
-                data:data.revenueChart||[],
-                borderColor:'#4f8cff',
-                backgroundColor:'rgba(79,140,255,0.2)',
-                fill:true,
-                tension:0.4
-            }]
-        },
-        options:{
-            animation:{duration:1200},
-            plugins:{legend:{display:false}}
-        }
-    });
+document.getElementById("monthlyRevenue").textContent =
+"LKR " + monthly.toLocaleString();
 
-    if(donutChart) donutChart.destroy();
-    donutChart=new Chart(document.getElementById("donutChart"),{
-        type:'doughnut',
-        data:{
-            labels:["Check In","Check Out"],
-            datasets:[{
-                data:[data.checkInToday||0,data.checkOutToday||0],
-                backgroundColor:['#34d399','#ff6b6b'],
-                borderWidth:0
-            }]
-        },
-        options:{
-            cutout:"70%",
-            animation:{duration:900}
-        }
-    });
+const percent = monthly ? Math.min((daily/monthly)*100,100) : 0;
 
-    const occupied=data.occupiedRooms||0;
-    const available=data.availableRooms||0;
-    const total=occupied+available;
-    const percent=total?Math.round((occupied/total)*100):0;
+document.getElementById("revenuePercent").textContent =
+percent.toFixed(1) + "%";
 
-    document.getElementById("occupancyPercent").textContent=
-        percent+"%";
+document.getElementById("revenueProgressBar").style.width =
+percent + "%";
 
-    if(occupancyGauge) occupancyGauge.destroy();
-    occupancyGauge=new Chart(document.getElementById("occupancyGauge"),{
-        type:'doughnut',
-        data:{
-            datasets:[{
-                data:[percent,100-percent],
-                backgroundColor:['#34d399','#2c2c3a'],
-                borderWidth:0
-            }]
-        },
-        options:{
-            cutout:'75%',
-            animation:{
-                duration:1400,
-                easing:'easeOutQuart'
-            },
-            plugins:{legend:{display:false}}
-        }
-    });
+/* Revenue Trend */
+if(revenueChart) revenueChart.destroy();
+revenueChart=new Chart(document.getElementById("revenueChart"),{
+type:'line',
+data:{
+labels:data.revenueLabels||[],
+datasets:[{
+data:data.revenueChart||[],
+borderColor:'#4f8cff',
+backgroundColor:'rgba(79,140,255,0.2)',
+pointBackgroundColor:'#ef4444',
+pointBorderColor:'#ffffff',
+pointRadius:5,
+pointHoverRadius:7,
+pointBorderWidth:2,
+fill:true,
+tension:0.4
+}]
+},
+options:{plugins:{legend:{display:false}}}
+});
 
-    if(occupancySpark) occupancySpark.destroy();
-    occupancySpark=new Chart(document.getElementById("occupancySparkline"),{
-        type:'line',
-        data:{
-            labels:data.revenueLabels||[],
-            datasets:[{
-                data:data.occupancyTrend||[],
-                borderColor:'#34d399',
-                backgroundColor:'rgba(52,211,153,0.15)',
-                fill:true,
-                tension:0.4,
-                pointRadius:0
-            }]
-        },
-        options:{
-            animation:{duration:800},
-            plugins:{legend:{display:false}},
-            scales:{x:{display:false},y:{display:false}}
-        }
-    });
+/* Booking Activity */
+if(bookingBarChart) bookingBarChart.destroy();
+bookingBarChart=new Chart(document.getElementById("bookingBarChart"),{
+type:'bar',
+data:{
+labels:["New Booking","Check In","Check Out"],
+datasets:[{
+data:[data.dailyReservations||0,data.checkInToday||0,data.checkOutToday||0],
+backgroundColor:['#8b5cf6','#34d399','#ff6b6b'],
+borderRadius:0,
+barThickness:80
+}]
+},
+options:{plugins:{legend:{display:false}}}
+});
+
+/* Room Occupancy */
+const occupied=data.occupiedRooms||0;
+const available=data.availableRooms||0;
+const total=occupied+available;
+const occPercent=total?Math.round((occupied/total)*100):0;
+
+document.getElementById("occupancyPercent").textContent=occPercent+"%";
+
+if(occupancyGauge) occupancyGauge.destroy();
+occupancyGauge=new Chart(document.getElementById("occupancyGauge"),{
+type:'doughnut',
+data:{
+datasets:[{
+data:[occPercent,100-occPercent],
+backgroundColor:['#34d399','#111827'],
+borderWidth:0
+}]
+},
+options:{cutout:'75%',plugins:{legend:{display:false}}}
+});
+
+if(occupancySpark) occupancySpark.destroy();
+occupancySpark=new Chart(document.getElementById("occupancySparkline"),{
+type:'line',
+data:{
+labels:data.revenueLabels||[],
+datasets:[{
+data:data.occupancyTrend||[],
+borderColor:'#34d399',
+backgroundColor:'rgba(52,211,153,0.15)',
+fill:true,
+tension:0.4,
+pointRadius:0
+}]
+},
+options:{plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}}
+});
+
+/* Donut */
+if(donutChart) donutChart.destroy();
+const checkIn=data.checkInToday||0;
+const checkOut=data.checkOutToday||0;
+const totalCheck=checkIn+checkOut;
+const noData=totalCheck===0;
+
+donutChart=new Chart(document.getElementById("donutChart"),{
+type:'doughnut',
+data:{
+labels:["Check In","Check Out"],
+datasets:[{
+data:noData?[1,1]:[checkIn,checkOut],
+backgroundColor:noData?['#111827','#111827']:['#34d399','#ff6b6b'],
+borderWidth:30,
+borderColor:'transparent'
+}]
+},
+options:{
+cutout:"70%",
+plugins:{
+legend:{labels:{color:noData?'#777':'#ffffff'}},
+tooltip:{enabled:!noData}
+}
+}
+});
+
+/* Revenue Distribution */
+if(revenuePieChart) revenuePieChart.destroy();
+revenuePieChart=new Chart(document.getElementById("revenuePieChart"),{
+type:'doughnut',
+data:{
+labels:["Today","Remaining"],
+datasets:[{
+data:noRevenueData?[1,1]:[daily,remaining],
+backgroundColor:noRevenueData
+? ['#00c6ff','#111827']
+: ['#4f8cff','#111827'],
+borderWidth:30,
+borderColor:'transparent'
+}]
+},
+options:{
+cutout:"70%",
+plugins:{
+legend:{labels:{color:noRevenueData?'#777':'#ffffff'}},
+tooltip:{enabled:!noRevenueData}
+}
+}
+});
 
 });
 }
 
 loadDashboard();
-setInterval(loadDashboard,10000);
+setInterval(loadDashboard,50000);
 </script>
 
-</body>
 <footer class="dashboard-footer">
-    <p><strong>Authorized Staff & Admin Only</strong></p>
-    <p>© 2026 Ocean View Resort – Galle</p>
+<p><strong>Authorized Staff &amp; Admin Only</strong></p>
+<p>© 2026 Ocean View Resort – Galle</p>
 </footer>
+
+</body>
 </html>

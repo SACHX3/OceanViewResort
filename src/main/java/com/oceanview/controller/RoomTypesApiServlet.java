@@ -13,6 +13,8 @@ import java.util.List;
 @WebServlet("/api/roomTypes")
 public class RoomTypesApiServlet extends HttpServlet {
 
+    private static final long serialVersionUID = 1L;
+
     private final RoomDAO roomDAO = new RoomDAO();
 
     @Override
