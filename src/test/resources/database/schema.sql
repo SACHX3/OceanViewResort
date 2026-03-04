@@ -8,7 +8,8 @@ DROP TABLE IF EXISTS users;
 -- ================= ROOM TYPES =================
 CREATE TABLE room_types (
   room_type_id INT AUTO_INCREMENT PRIMARY KEY,
-  type_name VARCHAR(50) NOT NULL UNIQUE
+  type_name VARCHAR(50) NOT NULL UNIQUE,
+  image VARCHAR(255)
 );
 
 -- ================= ROOMS =================
