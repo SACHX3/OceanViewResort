@@ -23,24 +23,27 @@ public class RoomStatusApiServlet extends HttpServlet {
         res.setContentType("application/json");
 
         try {
+
             List<Room> rooms = roomDAO.findAllRoomsWithStatus();
 
             StringBuilder json = new StringBuilder("[");
             for (Room r : rooms) {
                 json.append("{")
-                    .append("\"roomId\":").append(r.getRoomId()).append(",")
-                    .append("\"roomNumber\":\"").append(r.getRoomNumber()).append("\",")
-                    .append("\"roomType\":\"").append(r.getRoomType()).append("\",")
-                    .append("\"price\":").append(r.getRatePerNight()).append(",")
-                    .append("\"status\":\"").append(r.getStatus()).append("\"")
-                    .append("},");
+                        .append("\"roomId\":").append(r.getRoomId()).append(",")
+                        .append("\"roomNumber\":\"").append(r.getRoomNumber()).append("\",")
+                        .append("\"roomType\":\"").append(r.getRoomType()).append("\",")
+                        .append("\"price\":").append(r.getRatePerNight()).append(",")
+                        .append("\"status\":\"").append(r.getStatus()).append("\",")
+                        .append("\"image\":\"").append(r.getImage()).append("\"")
+                        .append("},");
             }
-            if (json.length() > 1) json.setLength(json.length() - 1);
+            if (json.length() > 1) {json.setLength(json.length() - 1);}
             json.append("]");
 
             res.getWriter().write(json.toString());
 
         } catch (Exception e) {
+
             e.printStackTrace();
             res.getWriter().write("[]");
         }

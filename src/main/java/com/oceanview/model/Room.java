@@ -8,6 +8,7 @@ public class Room {
     private String roomType;
     private double ratePerNight;
     private String status;
+    private String image;
 
     public int getRoomId() {
         return roomId;
@@ -55,5 +56,13 @@ public class Room {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

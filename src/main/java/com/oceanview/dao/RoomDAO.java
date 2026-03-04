@@ -10,12 +10,10 @@ import java.util.List;
 public class RoomDAO {
 
     /* ================= FIND OR CREATE ROOM TYPE ================= */
-
-    public int findOrCreateRoomType(String typeName)
-            throws SQLException {
+    public int findOrCreateRoomType(String typeName) throws SQLException {
 
         String selectSql =
-                "SELECT room_type_id FROM room_types WHERE type_name = ?";
+                "SELECT room_type_id FROM room_types WHERE type_name=?";
 
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(selectSql)) {
@@ -46,9 +44,9 @@ public class RoomDAO {
 
         throw new SQLException("Failed to create room type");
     }
-
+    
     /* ================= ADD ROOM ================= */
-
+    
     public void addRoom(Room room) throws SQLException {
 
         String sql =
@@ -64,9 +62,9 @@ public class RoomDAO {
             ps.executeUpdate();
         }
     }
-
+    
     /* ================= UPDATE ROOM ================= */
-
+    
     public void updateRoom(int roomId,
                            String typeName,
                            double price,
@@ -89,7 +87,7 @@ public class RoomDAO {
     }
 
     /* ================= DELETE ROOM ================= */
-
+    
     public void deleteRoom(int roomId) throws SQLException {
 
         String sql = "DELETE FROM rooms WHERE room_id=?";
@@ -101,11 +99,10 @@ public class RoomDAO {
             ps.executeUpdate();
         }
     }
-
+    
     /* ================= CHECK DUPLICATE ================= */
-
-    public boolean roomNumberExists(String roomNumber)
-            throws SQLException {
+    
+    public boolean roomNumberExists(String roomNumber) throws SQLException {
 
         String sql =
                 "SELECT COUNT(*) FROM rooms WHERE room_number=?";
@@ -118,11 +115,10 @@ public class RoomDAO {
             return rs.next() && rs.getInt(1) > 0;
         }
     }
-
+    
     /* ================= UPDATE STATUS ================= */
-
-    public void updateRoomStatus(int roomId, String status)
-            throws SQLException {
+    
+    public void updateRoomStatus(int roomId, String status) throws SQLException {
 
         String sql =
                 "UPDATE rooms SET status=? WHERE room_id=?";
@@ -136,16 +132,15 @@ public class RoomDAO {
         }
     }
 
-    /* ================= FIND AVAILABLE ROOMS ================= */
-
-    public List<Room> findAvailableRooms()
-            throws SQLException {
+  /* ================= FIND AVAILABLE ROOMS ================= */
+    
+    public List<Room> findAvailableRooms() throws SQLException {
 
         List<Room> rooms = new ArrayList<>();
 
         String sql =
                 "SELECT r.room_id, r.room_number, r.status, r.rate_per_night, " +
-                "rt.room_type_id, rt.type_name " +
+                "rt.room_type_id, rt.type_name, rt.image " +
                 "FROM rooms r " +
                 "JOIN room_types rt ON r.room_type_id = rt.room_type_id " +
                 "WHERE r.status='AVAILABLE'";
@@ -157,12 +152,14 @@ public class RoomDAO {
             while (rs.next()) {
 
                 Room room = new Room();
+
                 room.setRoomId(rs.getInt("room_id"));
                 room.setRoomNumber(rs.getString("room_number"));
                 room.setStatus(rs.getString("status"));
                 room.setRatePerNight(rs.getDouble("rate_per_night"));
                 room.setRoomTypeId(rs.getInt("room_type_id"));
                 room.setRoomType(rs.getString("type_name"));
+                room.setImage(rs.getString("image"));
 
                 rooms.add(room);
             }
@@ -170,17 +167,16 @@ public class RoomDAO {
 
         return rooms;
     }
-
+    
     /* ================= FIND ALL ROOMS ================= */
 
-    public List<Room> findAllRoomsWithStatus()
-            throws SQLException {
+    public List<Room> findAllRoomsWithStatus() throws SQLException {
 
         List<Room> list = new ArrayList<>();
 
         String sql =
                 "SELECT r.room_id, r.room_number, r.status, r.rate_per_night, " +
-                "rt.room_type_id, rt.type_name " +
+                "rt.room_type_id, rt.type_name, rt.image " +
                 "FROM rooms r " +
                 "JOIN room_types rt ON r.room_type_id = rt.room_type_id";
 
@@ -191,12 +187,14 @@ public class RoomDAO {
             while (rs.next()) {
 
                 Room room = new Room();
+
                 room.setRoomId(rs.getInt("room_id"));
                 room.setRoomNumber(rs.getString("room_number"));
                 room.setStatus(rs.getString("status"));
                 room.setRatePerNight(rs.getDouble("rate_per_night"));
                 room.setRoomTypeId(rs.getInt("room_type_id"));
                 room.setRoomType(rs.getString("type_name"));
+                room.setImage(rs.getString("image"));
 
                 list.add(room);
             }
@@ -205,15 +203,14 @@ public class RoomDAO {
         return list;
     }
 
-    /* ================= ROOM TYPE LIST ================= */
-
-    public List<Room> findAllRoomTypes()
-            throws SQLException {
+   /* ================= ROOM TYPE LIST ================= */
+    
+    public List<Room> findAllRoomTypes() throws SQLException {
 
         List<Room> types = new ArrayList<>();
 
         String sql =
-                "SELECT room_type_id, type_name FROM room_types";
+                "SELECT room_type_id, type_name, image FROM room_types";
 
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -222,8 +219,10 @@ public class RoomDAO {
             while (rs.next()) {
 
                 Room r = new Room();
+
                 r.setRoomTypeId(rs.getInt("room_type_id"));
                 r.setRoomType(rs.getString("type_name"));
+                r.setImage(rs.getString("image"));
 
                 types.add(r);
             }

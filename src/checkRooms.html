@@ -2,14 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Room Status Management | Ocean View Resort</title>
+<title>Room Management | Ocean View Resort</title>
 
 <link rel="stylesheet" href="webapp/css/styles.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-<style>
-
-</style>
 
 </head>
 
@@ -66,7 +62,7 @@
 </div>
 
 <h2>
-<i class="fa-solid fa-bed"></i> Room Status Management
+<i class="fa-solid fa-bed"></i> Room Management
 </h2>
 
 <p class="page-desc">
@@ -78,6 +74,7 @@
 <table class="data-table">
     <thead>
         <tr>
+            <th>Room Image</th>
             <th>Room No</th>
             <th>Room Type</th>
             <th>Price (LKR)</th>
@@ -85,7 +82,9 @@
             <th>Update</th>
         </tr>
     </thead>
+
     <tbody id="roomTable"></tbody>
+
 </table>
 
 </div>
@@ -93,7 +92,7 @@
 </main>
 
 <script>
-
+const contextPath = "/" + window.location.pathname.split("/")[1];
 /* ===== LOAD ROOM STATUS ===== */
 fetch("api/roomStatus")
 .then(res => res.json())
@@ -104,7 +103,7 @@ fetch("api/roomStatus")
 
     if (!data || data.length === 0) {
         table.innerHTML =
-            "<tr><td colspan='5'>No rooms found</td></tr>";
+            "<tr><td colspan='6'>No rooms found</td></tr>";
         return;
     }
 
@@ -115,16 +114,28 @@ fetch("api/roomStatus")
                 ? "status-available"
                 : "status-occupied";
 
+        /* ===== BUILD IMAGE PATH (WORKS WITH ANY PROJECT NAME) ===== */
+        const imgPath = contextPath + "/webapp/" + room.image;
+
         table.innerHTML += `
             <tr>
+
+                <td>
+                    <img src="${imgPath}" class="room-img">
+                </td>
+
                 <td>${room.roomNumber}</td>
+
                 <td>${room.roomType}</td>
+
                 <td>LKR ${room.price}</td>
+
                 <td>
                     <span class="status-badge ${badgeClass}">
                         ${room.status}
                     </span>
                 </td>
+
                 <td>
                     <form method="post"
                           action="updateRoomStatus"
@@ -150,6 +161,7 @@ fetch("api/roomStatus")
                         </button>
                     </form>
                 </td>
+
             </tr>
         `;
     });
@@ -170,8 +182,10 @@ if (p.get("error") === "true") {
 </script>
 
 </body>
+
 <footer class="dashboard-footer">
     <p><strong>Authorized Staff &amp; Admin Only</strong></p>
     <p>© 2026 Ocean View Resort – Galle</p>
 </footer>
+
 </html>
