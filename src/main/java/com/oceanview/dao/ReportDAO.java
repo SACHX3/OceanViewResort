@@ -77,8 +77,35 @@ public class ReportDAO {
             "FROM billing " +
             "WHERE generated_at >= DATE(NOW()) - INTERVAL 6 DAY " +
             "AND generated_at < DATE(NOW()) + INTERVAL 1 DAY " +
-            "GROUP BY DATE(generated_at) " +
-            "ORDER BY day ASC";
+            "GROUP BY DATE(generated_at) ORDER BY day ASC";
+
+        try (Connection c = DBConnection.getInstance().getConnection();
+             PreparedStatement p = c.prepareStatement(sql);
+             ResultSet r = p.executeQuery()) {
+
+            while (r.next()) {
+                map.put(r.getString("day"), r.getDouble("total"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return map;
+    }
+    
+    /* ================= 30 DAY REVENUE ================= */
+    public Map<String, Double> last30DaysRevenue() {
+
+        Map<String, Double> map = new LinkedHashMap<>();
+
+        String sql =
+            "SELECT DATE(generated_at) as day, " +
+            "IFNULL(SUM(total_amount),0) as total " +
+            "FROM billing " +
+            "WHERE generated_at >= DATE(NOW()) - INTERVAL 29 DAY " +
+            "AND generated_at < DATE(NOW()) + INTERVAL 1 DAY " +
+            "GROUP BY DATE(generated_at) ORDER BY day ASC";
 
         try (Connection c = DBConnection.getInstance().getConnection();
              PreparedStatement p = c.prepareStatement(sql);
@@ -95,19 +122,103 @@ public class ReportDAO {
         return map;
     }
 
-    /* ================= 7 DAY OCCUPANCY ================= */
+    /* ================= OCCUPANCY TREND ================= */
 
-    public Map<String, Integer> last7DaysOccupancy() {
+    public Map<String, Integer> last30DaysOccupancy() {
 
         Map<String, Integer> map = new LinkedHashMap<>();
 
         String sql =
             "SELECT DATE(check_in) as day, COUNT(*) as total " +
             "FROM reservations " +
-            "WHERE check_in >= DATE(NOW()) - INTERVAL 6 DAY " +
+            "WHERE check_in >= DATE(NOW()) - INTERVAL 29 DAY " +
             "AND check_in < DATE(NOW()) + INTERVAL 1 DAY " +
-            "GROUP BY DATE(check_in) " +
-            "ORDER BY day ASC";
+            "GROUP BY DATE(check_in) ORDER BY day ASC";
+
+        try (Connection c = DBConnection.getInstance().getConnection();
+             PreparedStatement p = c.prepareStatement(sql);
+             ResultSet r = p.executeQuery()) {
+
+            while (r.next()) {
+                map.put(r.getString("day"), r.getInt("total"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return map;
+    }
+    
+    /* ================= CHECK-IN TREND ================= */
+
+    public Map<String, Integer> last30DaysCheckInTrend() {
+
+        Map<String, Integer> map = new LinkedHashMap<>();
+
+        String sql =
+            "SELECT DATE(check_in) as day, COUNT(*) as total " +
+            "FROM reservations " +
+            "WHERE check_in >= DATE(NOW()) - INTERVAL 29 DAY " +
+            "AND check_in < DATE(NOW()) + INTERVAL 1 DAY " +
+            "GROUP BY DATE(check_in) ORDER BY day ASC";
+
+        try (Connection c = DBConnection.getInstance().getConnection();
+             PreparedStatement p = c.prepareStatement(sql);
+             ResultSet r = p.executeQuery()) {
+
+            while (r.next()) {
+                map.put(r.getString("day"), r.getInt("total"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return map;
+    }
+
+    /* ================= CHECK-OUT TREND ================= */
+
+    public Map<String, Integer> last30DaysCheckOutTrend() {
+
+        Map<String, Integer> map = new LinkedHashMap<>();
+
+        String sql =
+            "SELECT DATE(checked_out_at) as day, COUNT(*) as total " +
+            "FROM reservations " +
+            "WHERE status='CHECKED_OUT' " +
+            "AND checked_out_at >= DATE(NOW()) - INTERVAL 29 DAY " +
+            "AND checked_out_at < DATE(NOW()) + INTERVAL 1 DAY " +
+            "GROUP BY DATE(checked_out_at) ORDER BY day ASC";
+
+        try (Connection c = DBConnection.getInstance().getConnection();
+             PreparedStatement p = c.prepareStatement(sql);
+             ResultSet r = p.executeQuery()) {
+
+            while (r.next()) {
+                map.put(r.getString("day"), r.getInt("total"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return map;
+    }
+    
+    /* ================= Booking activity 30days ================= */
+    
+    public Map<String, Integer> last30DaysBookingActivity() {
+
+        Map<String, Integer> map = new LinkedHashMap<>();
+
+        String sql =
+            "SELECT DATE(created_at) as day, COUNT(*) as total " +
+            "FROM reservations " +
+            "WHERE created_at >= DATE(NOW()) - INTERVAL 29 DAY " +
+            "AND created_at < DATE(NOW()) + INTERVAL 1 DAY " +
+            "GROUP BY DATE(created_at) ORDER BY day ASC";
 
         try (Connection c = DBConnection.getInstance().getConnection();
              PreparedStatement p = c.prepareStatement(sql);

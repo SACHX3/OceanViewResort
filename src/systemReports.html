@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<title>System Reports | Admin Dashboard</title>
+
+<link rel="stylesheet" href="webapp/css/styles.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<script src="webapp/js/chart.js"></script>
+
+<!-- FIX: Added jsPDF Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+</head>
+
+<body class="dark-body">
+
+<header class="top-header-admin">
+
+<div class="logo">
+<i class="fa-solid fa-hotel"></i> Ocean View Resort
+</div>
+
+<a href="logout" class="logout-btn">
+<i class="fa-solid fa-right-from-bracket"></i> Logout
+</a>
+
+</header>
+
+<aside class="sidebar-fixed">
+
+<h3><i class="fa-solid fa-user-shield"></i> Admin Panel</h3>
+
+<a href="adminPanel.html">
+<i class="fa-solid fa-chart-line"></i> Dashboard
+</a>
+
+<a href="manageUsers.html">
+<i class="fa-solid fa-users"></i> Manage Users
+</a>
+
+<a href="adminRooms.html">
+<i class="fa-solid fa-bed"></i> Manage Rooms
+</a>
+
+<a href="systemReport.html" class="active">
+<i class="fa-solid fa-chart-column"></i> System Reports
+</a>
+
+</aside>
+
+<main class="dashboard-main">
+
+<h2>
+<i class="fa-solid fa-chart-column"></i> System Reports
+</h2>
+
+<div class="dashboard-card">
+
+<h3>
+<i class="fa-solid fa-file-chart-line"></i>
+Report Tools
+</h3>
+
+<button class="btn" onclick="loadReport()">
+<i class="fa-solid fa-rotate"></i> Generate Report
+</button>
+
+<button class="btn" onclick="exportCSV()">
+<i class="fa-solid fa-file-csv"></i> Export CSV
+</button>
+
+<button class="btn" onclick="exportPDF()">
+<i class="fa-solid fa-file-pdf"></i> Export PDF
+</button>
+
+</div>
+
+<div class="charts-row">
+
+<div class="dashboard-card chart-card">
+
+<h3>
+<i class="fa-solid fa-chart-line"></i>
+Revenue Trend (Last 30 Days)
+</h3>
+
+<canvas id="revenueChart" height="80"></canvas>
+
+</div>
+
+<div class="dashboard-card chart-card">
+
+<h3>
+<i class="fa-solid fa-bed"></i>
+Room Occupancy Trend
+</h3>
+
+<canvas id="occupancyChart" height="80"></canvas>
+
+</div>
+
+<div class="dashboard-card chart-card">
+
+<h3>
+<i class="fa-solid fa-chart-area"></i>
+Booking Trend 
+</h3>
+
+<canvas id="bookingTrendChart" height="100"></canvas>
+
+</div>
+
+</div>
+
+</main>
+
+<script>
+
+let reportData = {};
+let revenueChartInstance = null;
+let occupancyChartInstance = null;
+let bookingChartInstance = null;
+
+function loadReport(){
+
+fetch("api/reports")
+
+.then(r=>r.json())
+
+.then(data=>{
+
+reportData = data;
+
+renderRevenueChart(data);
+renderOccupancyChart(data);
+renderBookingTrend(data);
+
+});
+
+}
+
+function renderRevenueChart(data){
+
+const ctx = document.getElementById("revenueChart");
+
+if(revenueChartInstance)
+revenueChartInstance.destroy();
+
+revenueChartInstance = new Chart(ctx, {
+
+type: "line",
+
+data: {
+
+labels: data.revenueLabels,
+
+datasets: [{
+label: "Revenue (LKR)",
+data: data.revenueChart,
+borderWidth: 3,
+tension: 0.3
+}]
+
+}
+
+});
+
+}
+
+function renderOccupancyChart(data){
+
+const ctx = document.getElementById("occupancyChart");
+
+if(occupancyChartInstance)
+occupancyChartInstance.destroy();
+
+occupancyChartInstance = new Chart(ctx, {
+
+type: "bar",
+
+data: {
+
+labels: data.revenueLabels,
+
+datasets: [{
+label: "Occupied Rooms",
+data: data.occupancyTrend,
+borderWidth: 1
+}]
+
+}
+
+});
+
+}
+
+function renderBookingTrend(data){
+
+const ctx = document.getElementById("bookingTrendChart");
+
+if(bookingChartInstance)
+bookingChartInstance.destroy();
+
+bookingChartInstance = new Chart(ctx, {
+
+type: "line",
+
+data: {
+
+labels: data.revenueLabels,
+
+datasets: [
+
+{
+label: "Bookings",
+data: data.bookingTrend,
+borderWidth: 3,
+tension: 0.3
+},
+
+{
+label: "Check-In",
+data: data.checkInTrend,
+borderWidth: 3,
+tension: 0.3
+},
+
+{
+label: "Check-Out",
+data: data.checkOutTrend,
+borderWidth: 3,
+tension: 0.3
+}
+
+]
+
+}
+
+});
+
+}
+
+function exportCSV(){
+
+const csv =
+`Metric,Value
+Daily Reservations,${reportData.dailyReservations}
+Check In Today,${reportData.checkInToday}
+Check Out Today,${reportData.checkOutToday}
+Occupied Rooms,${reportData.occupiedRooms}
+Available Rooms,${reportData.availableRooms}
+Daily Revenue,${reportData.dailyRevenue}
+Monthly Revenue,${reportData.monthlyRevenue}`;
+
+const blob = new Blob([csv], {type:"text/csv"});
+const url = window.URL.createObjectURL(blob);
+
+const link = document.createElement("a");
+link.href = url;
+link.download = "OceanView_System_Report.csv";
+
+document.body.appendChild(link);
+link.click();
+document.body.removeChild(link);
+
+}
+
+function exportPDF(){
+
+const { jsPDF } = window.jspdf;
+
+const doc = new jsPDF();
+
+doc.setFontSize(18);
+doc.text("Ocean View Resort System Report", 20, 20);
+
+doc.setFontSize(12);
+
+doc.text("Daily Reservations: " + reportData.dailyReservations, 20, 40);
+doc.text("Check-In Today: " + reportData.checkInToday, 20, 50);
+doc.text("Check-Out Today: " + reportData.checkOutToday, 20, 60);
+doc.text("Occupied Rooms: " + reportData.occupiedRooms, 20, 70);
+doc.text("Available Rooms: " + reportData.availableRooms, 20, 80);
+
+doc.text("Daily Revenue: LKR " + reportData.dailyRevenue, 20, 100);
+doc.text("Monthly Revenue: LKR " + reportData.monthlyRevenue, 20, 110);
+
+doc.save("OceanView_System_Report.pdf");
+
+}
+
+window.onload = loadReport;
+
+</script>
+
+<footer class="dashboard-footer">
+
+<p><strong>Authorized Staff &amp; Admin Only</strong></p>
+<p>© 2026 Ocean View Resort – Galle</p>
+
+</footer>
+
+</body>
+</html>
