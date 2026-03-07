@@ -12,7 +12,6 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 
 <script src="webapp/js/chart.js"></script>
 
-<!-- FIX: Added jsPDF Library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 </head>
@@ -112,9 +111,7 @@ Booking Trend
 </h3>
 
 <canvas id="bookingTrendChart" height="100"></canvas>
-
 </div>
-
 </div>
 
 </main>
@@ -126,174 +123,159 @@ let revenueChartInstance = null;
 let occupancyChartInstance = null;
 let bookingChartInstance = null;
 
-function loadReport(){
-
-fetch("api/reports")
-
-.then(r=>r.json())
-
-.then(data=>{
-
-reportData = data;
-
-renderRevenueChart(data);
-renderOccupancyChart(data);
-renderBookingTrend(data);
-
-});
-
+function loadReport() {
+	fetch("api/reports").then(r => r.json()).then(data => {
+		reportData = data;
+		renderRevenueChart(data);
+		renderOccupancyChart(data);
+		renderBookingTrend(data);
+	});
 }
 
-function renderRevenueChart(data){
-
-const ctx = document.getElementById("revenueChart");
-
-if(revenueChartInstance)
-revenueChartInstance.destroy();
-
-revenueChartInstance = new Chart(ctx, {
-
-type: "line",
-
-data: {
-
-labels: data.revenueLabels,
-
-datasets: [{
-label: "Revenue (LKR)",
-data: data.revenueChart,
-borderWidth: 3,
-tension: 0.3
-}]
-
+function renderRevenueChart(data) {
+	const ctx = document.getElementById("revenueChart");
+	if (revenueChartInstance) revenueChartInstance.destroy();
+	revenueChartInstance = new Chart(ctx, {
+		type: "line",
+		data: {
+			labels: data.revenueLabels,
+			datasets: [{
+				label: "Revenue (LKR)",
+				data: data.revenueChart,
+				borderWidth: 3,
+				tension: 0.3
+			}]
+		}
+	});
 }
 
-});
-
+function renderOccupancyChart(data) {
+	const ctx = document.getElementById("occupancyChart");
+	if (occupancyChartInstance) occupancyChartInstance.destroy();
+	occupancyChartInstance = new Chart(ctx, {
+		type: "bar",
+		data: {
+			labels: data.revenueLabels,
+			datasets: [{
+				label: "Occupied Rooms",
+				data: data.occupancyTrend,
+				borderWidth: 1
+			}]
+		}
+	});
 }
 
-function renderOccupancyChart(data){
-
-const ctx = document.getElementById("occupancyChart");
-
-if(occupancyChartInstance)
-occupancyChartInstance.destroy();
-
-occupancyChartInstance = new Chart(ctx, {
-
-type: "bar",
-
-data: {
-
-labels: data.revenueLabels,
-
-datasets: [{
-label: "Occupied Rooms",
-data: data.occupancyTrend,
-borderWidth: 1
-}]
-
+function renderBookingTrend(data) {
+	const ctx = document.getElementById("bookingTrendChart");
+	if (bookingChartInstance) bookingChartInstance.destroy();
+	bookingChartInstance = new Chart(ctx, {
+		type: "line",
+		data: {
+			labels: data.revenueLabels,
+			datasets: [{
+				label: "Bookings",
+				data: data.bookingTrend,
+				borderWidth: 3,
+				tension: 0.3
+			}, {
+				label: "Check-In",
+				data: data.checkInTrend,
+				borderWidth: 3,
+				tension: 0.3
+			}, {
+				label: "Check-Out",
+				data: data.checkOutTrend,
+				borderWidth: 3,
+				tension: 0.3
+			}]
+		}
+	});
 }
 
-});
-
+function exportCSV() {
+	let csv = "";
+	csv += "Ocean View Resort System Report\n";
+	csv += "Last 30 Days Report\n";
+	csv += "Generated," + new Date().toLocaleDateString() + "\n\n";
+	csv += "Date,Revenue (LKR),Occupied Rooms,Bookings,Check-In,Check-Out\n";
+	let totalRevenue = 0;
+	let totalBookings = 0;
+	for (let i = 0; i < reportData.revenueLabels.length; i++) {
+		const revenue = reportData.revenueChart[i] || 0;
+		const bookings = reportData.bookingTrend[i] || 0;
+		totalRevenue += revenue;
+		totalBookings += bookings;
+		csv += reportData.revenueLabels[i] + "," + revenue + "," + (reportData.occupancyTrend[i] || 0) + "," + bookings + "," + (reportData.checkInTrend[i] || 0) + "," + (reportData.checkOutTrend[i] || 0) + "\n";
+	}
+	csv += "\n";
+	csv += "Summary\n";
+	csv += "Total Revenue (30 Days)," + totalRevenue + "\n";
+	csv += "Total Bookings (30 Days)," + totalBookings + "\n";
+	const blob = new Blob([csv], {
+		type: "text/csv"
+	});
+	const url = window.URL.createObjectURL(blob);
+	const link = document.createElement("a");
+	link.href = url;
+	link.download = "OceanView_30_Days_System_Report.csv";
+	document.body.appendChild(link);
+	link.click();
+	document.body.removeChild(link);
 }
 
-function renderBookingTrend(data){
-
-const ctx = document.getElementById("bookingTrendChart");
-
-if(bookingChartInstance)
-bookingChartInstance.destroy();
-
-bookingChartInstance = new Chart(ctx, {
-
-type: "line",
-
-data: {
-
-labels: data.revenueLabels,
-
-datasets: [
-
-{
-label: "Bookings",
-data: data.bookingTrend,
-borderWidth: 3,
-tension: 0.3
-},
-
-{
-label: "Check-In",
-data: data.checkInTrend,
-borderWidth: 3,
-tension: 0.3
-},
-
-{
-label: "Check-Out",
-data: data.checkOutTrend,
-borderWidth: 3,
-tension: 0.3
+function exportPDF() {
+	const {
+		jsPDF
+	} = window.jspdf;
+	const doc = new jsPDF();
+	let y = 20;
+	doc.setFontSize(20);
+	doc.text("Ocean View Resort", 105, y, {
+		align: "center"
+	});
+	y += 8;
+	doc.setFontSize(14);
+	doc.text("System Report - Last 30 Days", 105, y, {
+		align: "center"
+	});
+	y += 8;
+	const today = new Date().toLocaleDateString();
+	doc.setFontSize(10);
+	doc.text("Generated: " + today, 105, y, {
+		align: "center"
+	});
+	y += 15;
+	doc.setFontSize(11);
+	doc.setFont(undefined, "bold");
+	doc.text("Date", 15, y);
+	doc.text("Revenue", 45, y);
+	doc.text("Rooms", 80, y);
+	doc.text("Bookings", 105, y);
+	doc.text("Check-In", 135, y);
+	doc.text("Check-Out", 165, y);
+	doc.setFont(undefined, "normal");
+	y += 6;
+	doc.line(10, y, 200, y);
+	y += 6;
+	for (let i = 0; i < reportData.revenueLabels.length; i++) {
+		doc.text(reportData.revenueLabels[i], 15, y);
+		doc.text("LKR " + (reportData.revenueChart[i] || 0), 45, y);
+		doc.text(String(reportData.occupancyTrend[i] || 0), 80, y);
+		doc.text(String(reportData.bookingTrend[i] || 0), 105, y);
+		doc.text(String(reportData.checkInTrend[i] || 0), 135, y);
+		doc.text(String(reportData.checkOutTrend[i] || 0), 165, y);
+		y += 8;
+		if (y > 270) {
+			doc.addPage();
+			y = 20;
+		}
+	}
+	doc.setFontSize(9);
+	doc.text("Ocean View Resort – Galle", 105, 290, {
+		align: "center"
+	});
+	doc.save("OceanView_30_Days_System_Report.pdf");
 }
-
-]
-
-}
-
-});
-
-}
-
-function exportCSV(){
-
-const csv =
-`Metric,Value
-Daily Reservations,${reportData.dailyReservations}
-Check In Today,${reportData.checkInToday}
-Check Out Today,${reportData.checkOutToday}
-Occupied Rooms,${reportData.occupiedRooms}
-Available Rooms,${reportData.availableRooms}
-Daily Revenue,${reportData.dailyRevenue}
-Monthly Revenue,${reportData.monthlyRevenue}`;
-
-const blob = new Blob([csv], {type:"text/csv"});
-const url = window.URL.createObjectURL(blob);
-
-const link = document.createElement("a");
-link.href = url;
-link.download = "OceanView_System_Report.csv";
-
-document.body.appendChild(link);
-link.click();
-document.body.removeChild(link);
-
-}
-
-function exportPDF(){
-
-const { jsPDF } = window.jspdf;
-
-const doc = new jsPDF();
-
-doc.setFontSize(18);
-doc.text("Ocean View Resort System Report", 20, 20);
-
-doc.setFontSize(12);
-
-doc.text("Daily Reservations: " + reportData.dailyReservations, 20, 40);
-doc.text("Check-In Today: " + reportData.checkInToday, 20, 50);
-doc.text("Check-Out Today: " + reportData.checkOutToday, 20, 60);
-doc.text("Occupied Rooms: " + reportData.occupiedRooms, 20, 70);
-doc.text("Available Rooms: " + reportData.availableRooms, 20, 80);
-
-doc.text("Daily Revenue: LKR " + reportData.dailyRevenue, 20, 100);
-doc.text("Monthly Revenue: LKR " + reportData.monthlyRevenue, 20, 110);
-
-doc.save("OceanView_System_Report.pdf");
-
-}
-
 window.onload = loadReport;
 
 </script>
